@@ -7,9 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		73383CC02CFA9197007150D7 /* modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* modules.swift */; };
+		73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB22CFA9197007150D7 /* ProjectModel.swift */; };
+		73383CC32CFA9197007150D7 /* MoodBoardMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB92CFA9197007150D7 /* MoodBoardMain.swift */; };
+		73383CC42CFA9197007150D7 /* mooedMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CBA2CFA9197007150D7 /* mooedMain.swift */; };
+		73383CC62CFA9197007150D7 /* mbImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB42CFA9197007150D7 /* mbImage.swift */; };
+		73383CC82CFA9197007150D7 /* mbAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB82CFA9197007150D7 /* mbAssets.swift */; };
 		D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */; };
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
-		D86BB6A52BF67EF00054AC82 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A42BF67EF00054AC82 /* Item.swift */; };
 		D86BB6A72BF67EF10054AC82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6A62BF67EF10054AC82 /* Assets.xcassets */; };
 		D86BB6AB2BF67EF10054AC82 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6AA2BF67EF10054AC82 /* Preview Assets.xcassets */; };
 		D86BB6B52BF67EF10054AC82 /* MozaicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6B42BF67EF10054AC82 /* MozaicTests.swift */; };
@@ -35,10 +40,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		73383CB22CFA9197007150D7 /* ProjectModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectModel.swift; sourceTree = "<group>"; };
+		73383CB42CFA9197007150D7 /* mbImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mbImage.swift; sourceTree = "<group>"; };
+		73383CB52CFA9197007150D7 /* modules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modules.swift; sourceTree = "<group>"; };
+		73383CB82CFA9197007150D7 /* mbAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mbAssets.swift; sourceTree = "<group>"; };
+		73383CB92CFA9197007150D7 /* MoodBoardMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodBoardMain.swift; sourceTree = "<group>"; };
+		73383CBA2CFA9197007150D7 /* mooedMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mooedMain.swift; sourceTree = "<group>"; };
 		D86BB69D2BF67EF00054AC82 /* Mozaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mozaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MozaicApp.swift; sourceTree = "<group>"; };
 		D86BB6A22BF67EF00054AC82 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		D86BB6A42BF67EF00054AC82 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		D86BB6A62BF67EF10054AC82 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D86BB6A82BF67EF10054AC82 /* Mozaic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Mozaic.entitlements; sourceTree = "<group>"; };
 		D86BB6AA2BF67EF10054AC82 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -74,6 +84,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		73383CB32CFA9197007150D7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				73383CB22CFA9197007150D7 /* ProjectModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		73383CB62CFA9197007150D7 /* Moodboard */ = {
+			isa = PBXGroup;
+			children = (
+				73383CB42CFA9197007150D7 /* mbImage.swift */,
+				73383CB52CFA9197007150D7 /* modules.swift */,
+			);
+			path = Moodboard;
+			sourceTree = "<group>";
+		};
+		73383CBB2CFA9197007150D7 /* Mooed */ = {
+			isa = PBXGroup;
+			children = (
+				73383CB62CFA9197007150D7 /* Moodboard */,
+				73383CB82CFA9197007150D7 /* mbAssets.swift */,
+				73383CB92CFA9197007150D7 /* MoodBoardMain.swift */,
+				73383CBA2CFA9197007150D7 /* mooedMain.swift */,
+			);
+			path = Mooed;
+			sourceTree = "<group>";
+		};
 		D86BB6942BF67EF00054AC82 = {
 			isa = PBXGroup;
 			children = (
@@ -97,9 +135,10 @@
 		D86BB69F2BF67EF00054AC82 /* Mozaic */ = {
 			isa = PBXGroup;
 			children = (
+				73383CB32CFA9197007150D7 /* Models */,
+				73383CBB2CFA9197007150D7 /* Mooed */,
 				D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */,
 				D86BB6A22BF67EF00054AC82 /* ContentView.swift */,
-				D86BB6A42BF67EF00054AC82 /* Item.swift */,
 				D86BB6A62BF67EF10054AC82 /* Assets.xcassets */,
 				D86BB6A82BF67EF10054AC82 /* Mozaic.entitlements */,
 				D86BB6A92BF67EF10054AC82 /* Preview Content */,
@@ -196,7 +235,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1610;
 				TargetAttributes = {
 					D86BB69C2BF67EF00054AC82 = {
 						CreatedOnToolsVersion = 15.4;
@@ -262,8 +301,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73383CC02CFA9197007150D7 /* modules.swift in Sources */,
+				73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */,
+				73383CC32CFA9197007150D7 /* MoodBoardMain.swift in Sources */,
+				73383CC42CFA9197007150D7 /* mooedMain.swift in Sources */,
+				73383CC62CFA9197007150D7 /* mbImage.swift in Sources */,
+				73383CC82CFA9197007150D7 /* mbAssets.swift in Sources */,
 				D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */,
-				D86BB6A52BF67EF00054AC82 /* Item.swift in Sources */,
 				D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -335,6 +379,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -396,6 +441,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -423,6 +469,7 @@
 				CODE_SIGN_ENTITLEMENTS = Mozaic/Mozaic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Mozaic/Preview Content\"";
 				DEVELOPMENT_TEAM = VH3VD452Q2;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -461,6 +508,7 @@
 				CODE_SIGN_ENTITLEMENTS = Mozaic/Mozaic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Mozaic/Preview Content\"";
 				DEVELOPMENT_TEAM = VH3VD452Q2;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -494,10 +542,10 @@
 		D86BB6C82BF67EF10054AC82 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = VH3VD452Q2;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
@@ -517,10 +565,10 @@
 		D86BB6C92BF67EF10054AC82 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = VH3VD452Q2;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
@@ -540,9 +588,9 @@
 		D86BB6CB2BF67EF10054AC82 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = VH3VD452Q2;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
@@ -562,9 +610,9 @@
 		D86BB6CC2BF67EF10054AC82 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = VH3VD452Q2;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
