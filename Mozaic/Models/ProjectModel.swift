@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 struct mbRow {
+	let id: UUID = UUID()
 	var module: modules
 	var image: [Image]
 }
@@ -32,6 +33,27 @@ class ProjectModel {
     func writeToModel(items:[Image], indexs: [Int]) {
         self.imgC[indexs[0]].image[indexs[1]] = items[0]
     }
+	func cellwidth() -> CGFloat {
+		if self.gridGap == 0 {
+			return 155.0
+		} else {
+			return 155.0 - (self.gridGap / 2.0)
+		}
+	}
+	func twoCellWidth() -> CGFloat {
+		if self.gridGap == 0 {
+			return 155.0 * 2
+		} else {
+			return 155.0 * 2.0
+		}
+	}
+	func halfGridGap() -> CGFloat {
+		if self.gridGap == 0 {
+			return 0.0
+		} else {
+			return self.gridGap / 2.0
+		}
+	}
     
 	#if os(iOS)
     @MainActor

@@ -88,10 +88,10 @@ struct Modulewrapper: View {
 				case .twohlong:
 					TwoHLong(mbcell: mbcell)
 				case _:
-					Text("")
+					EmptyView()
 			}
 		}
-		.frame(width: 300, height: 310)
+		.frame(width: 310, height: 310)
 		.overlay(
 			ZStack {
 				if tapped {
@@ -113,11 +113,14 @@ struct Modulewrapper: View {
 					.padding()
 					.background(.ultraThinMaterial)
 					.clipShape(RoundedRectangle(cornerRadius: 10))
-					.frame(width: 200, height: 310)
+					
 				} else {
 					EmptyView().frame(width: 200, height: 310)
 				}
-			}.onTapGesture { tapped = false }
+			}
+			.onTapGesture { tapped = false }
+			.frame(width: 300, height: 300)
+			
 		)
 		.onLongPressGesture(minimumDuration: 0.10) {
 			tapped = true
@@ -131,7 +134,7 @@ struct Modulewrapper: View {
 }
 
 #Preview {
-	let cellWidth: CGFloat = 150
-	let twoCellWidth: CGFloat = 150 * 2
+	let cellWidth: CGFloat = 155
+	let twoCellWidth: CGFloat = 155 * 2
 	Modulewrapper(mbcell: mbCell(cellSpacing: 10, cell: cellWidth, twoCell: (twoCellWidth + 10) , img: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")], index: 0)).environment(ProjectModel())
 }

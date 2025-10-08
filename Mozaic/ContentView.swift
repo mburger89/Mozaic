@@ -16,15 +16,12 @@ struct ContentView: View {
 	@State private var importing: Bool = false
 	var body: some View {
 		NavigationSplitView {
-			VStack {
-				//				ScrollView {
-				//					ForEach(0...50, id: \.self) { i in Text("Sidebar \(i)") }
-				//				}
-			}
+			ScrollView(.vertical) {
+//					ForEach(0...50, id: \.self) { i in Text("Sidebar \(i)") }
+				}
 			.frame(minWidth: 225)
 			.navigationTitle("MoodBoard Title")
 		} detail: {
-			//			ScrollView(.horizontal) {
 			MoodBoardMain()
 				.environment(pm)
 				.toolbar {
@@ -83,47 +80,46 @@ struct ContentView: View {
 						})
 					}
 				}
-				.frame(maxWidth: 1000)
-			//			}
 		}
 		.inspector(isPresented: $showSettings) {
 			bottomBar(images: pm.selectedPHImages)
+//				.inspectorColumnWidth(min: 150, ideal: 250, max: 400)
 		}
 	}
 	func renderMoodBoard() {
 #if os(macOS)
-		guard let image = ImageRenderer(content: MoodBoardMain().environment(pm)).nsImage else {return}
-		if let tiffData = image.tiffRepresentation,
-		   let data = NSBitmapImageRep(data: tiffData)?.representation(using:.png, properties: [:]) {
-			PHPhotoLibrary.shared().performChanges({
-				let creationRequest = PHAssetCreationRequest.forAsset()
-				creationRequest.addResource(with: .photo, data: data, options: nil)
-			}, completionHandler: { success, error in
-				if success {
-					print("image saved to photos")
-				} else {
-					print("image failed to save")
-					print(error ?? " ")
-				}
-			})
-		}
+//		guard let image = ImageRenderer(content: MoodBoardMain().environment(pm)).nsImage else {return}
+//		if let tiffData = image.tiffRepresentation,
+//		   let data = NSBitmapImageRep(data: tiffData)?.representation(using:.png, properties: [:]) {
+//			PHPhotoLibrary.shared().performChanges({
+//				let creationRequest = PHAssetCreationRequest.forAsset()
+//				creationRequest.addResource(with: .photo, data: data, options: nil)
+//			}, completionHandler: { success, error in
+//				if success {
+//					print("image saved to photos")
+//				} else {
+//					print("image failed to save")
+//					print(error ?? " ")
+//				}
+//			})
+//		}
 #endif // os(macOS)
 #if os(iOS)
-		guard let image = ImageRenderer(content: MoodBoardMain().environment(pm)).uiImage else {return}
-		if let data = image.pngData() {
-			// Save PNG image to Photos
-			PHPhotoLibrary.shared().performChanges({
-				let creationRequest = PHAssetCreationRequest.forAsset()
-				creationRequest.addResource(with: .photo, data: data, options: nil)
-			}, completionHandler: { success, error in
-				if success {
-					print("image saved to photos")
-				} else {
-					print("image failed to save")
-					print(error ?? " ")
-				}
-			})
-		}
+//		guard let image = ImageRenderer(content: MoodBoardMain().environment(pm)).uiImage else {return}
+//		if let data = image.pngData() {
+//			// Save PNG image to Photos
+//			PHPhotoLibrary.shared().performChanges({
+//				let creationRequest = PHAssetCreationRequest.forAsset()
+//				creationRequest.addResource(with: .photo, data: data, options: nil)
+//			}, completionHandler: { success, error in
+//				if success {
+//					print("image saved to photos")
+//				} else {
+//					print("image failed to save")
+//					print(error ?? " ")
+//				}
+//			})
+//		}
 #endif // os(iOS)
 	}
 }

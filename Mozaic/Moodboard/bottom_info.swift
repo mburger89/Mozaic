@@ -22,12 +22,12 @@ struct BottomInfo: View {
 			}
 			Spacer()
 		}
-		.frame(maxWidth: 960, maxHeight: 75)
+		.frame(maxHeight: 75)
 		.background(.regularMaterial)
 		.cornerRadius(10)
     }
 }
 
 #Preview {
-	BottomInfo(Name: "Untitled Project", CreatedBy:"Ananomys")
+	BottomInfo(Name: "Untitled Project", CreatedBy:"Ananomys").padding()
 }

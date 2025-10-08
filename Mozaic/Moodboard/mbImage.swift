@@ -23,11 +23,14 @@ struct mbImage: View {
 				isTarget = target
 				print("target called")
 			})
-			.draggable(imgSlot, preview: { imgSlot.frame(width: (imgWidth / 2), height: (imgHeight / 2))
-				.clipShape(RoundedRectangle(cornerRadius: 10.0)) })
+			.draggable(imgSlot, preview: {
+				imgSlot.frame(width: (imgWidth / 2), height: (imgHeight / 2))
+					.clipShape(RoundedRectangle(cornerRadius: 10.0))
+			})
 			.overlay {
 				RoundedRectangle(cornerRadius: 10)
 					.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)
+					.frame(width: imgWidth, height: imgHeight)
 			}
 	}
 }
