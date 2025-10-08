@@ -1,56 +1,67 @@
 {
   "images" : [
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy 2.jpg",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy.jpg",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x0.jpg",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x0 1.jpg",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy 6.jpg",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy 3.jpg",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy 7.jpg",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy 8.jpg",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x.jpg",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x 1.jpg",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
+      "filename" : "Mozaic_temp-iOS-Default-1024x1024@1x Copy 4.jpg",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"

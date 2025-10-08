@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSFileProviderPresenceUsageDescription</key>
+	<string>access to files on local machine</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>access to external/ loose photos on local machine</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>access to files on local machine</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>access to files on local machine</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>access to files on local machine</string>
+</dict>
+</plist>

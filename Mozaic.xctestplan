@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "2C44A72A-96E2-4DFF-AB85-666ACAFA4818",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Mozaic.xcodeproj",
+      "identifier" : "D86BB69C2BF67EF00054AC82",
+      "name" : "Mozaic"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Mozaic.xcodeproj",
+        "identifier" : "D86BB6AF2BF67EF10054AC82",
+        "name" : "MozaicTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Mozaic.xcodeproj",
+        "identifier" : "D86BB6B92BF67EF10054AC82",
+        "name" : "MozaicUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
