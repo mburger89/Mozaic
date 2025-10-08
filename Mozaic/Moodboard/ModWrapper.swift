@@ -37,34 +37,28 @@ enum modules {
 				return "twohlong"
 		}
 	}
-	
-	static func fromString(_ string: String) -> modules? {
+	static func fromString(_ string: String) -> modules {
 		switch string {
-		case "vlong2short":
-			return .vlong2short
-		case "twoshorthlong":
-			return .twoshorthlong
-		case "twoshortvlong":
-			return .twoshortvlong
-		case "vlongtwoshort":
-			return .vlongtwoshort
-		case "fourshort":
-			return .fourshort
-		case "onecell":
-			return .oncecell
-		case "twovlong":
-			return .twovlong
-		case "twohlong":
-			return .twohlong
-		default:
-			return nil
+			case "vlong2short":
+				return .vlong2short
+			case "twoshorthlong":
+				return .twoshorthlong
+			case "twoshortvlong":
+				return .twoshortvlong
+			case "vlongtwoshort":
+				return .vlongtwoshort
+			case "fourshort":
+				return .fourshort
+			case "onecell":
+				return .oncecell
+			case "twovlong":
+				return .twovlong
+			case "twohlong":
+				return .twohlong
+			default:
+				return .vlong2short
 		}
 	}
-}
-
-struct mbRow {
-	var module: modules
-	var image: [Image]
 }
 
 struct Modulewrapper: View {
@@ -77,24 +71,24 @@ struct Modulewrapper: View {
 		VStack {
 			// Main module content
 			switch(pm.imgC[mbcell.index].module) {
-			case .vlong2short:
-				Vlong2Short(mbcell: mbcell)
-			case .twoshorthlong:
-				TwoShortHlong(mbcell: mbcell)
-			case .twoshortvlong:
-				TwoShortVlong(mbcell: mbcell)
-			case .vlongtwoshort:
-				VlongTwoShort(mbcell: mbcell)
-			case .fourshort:
-				FourShort(mbcell: mbcell)
-			case .oncecell:
-				OneCell(mbcell: mbcell)
-			case .twovlong:
-				TwoVLong(mbcell: mbcell)
-			case .twohlong:
-				TwoHLong(mbcell: mbcell)
-			case _:
-				Text("")
+				case .vlong2short:
+					Vlong2Short(mbcell: mbcell)
+				case .twoshorthlong:
+					TwoShortHlong(mbcell: mbcell)
+				case .twoshortvlong:
+					TwoShortVlong(mbcell: mbcell)
+				case .vlongtwoshort:
+					VlongTwoShort(mbcell: mbcell)
+				case .fourshort:
+					FourShort(mbcell: mbcell)
+				case .oncecell:
+					OneCell(mbcell: mbcell)
+				case .twovlong:
+					TwoVLong(mbcell: mbcell)
+				case .twohlong:
+					TwoHLong(mbcell: mbcell)
+				case _:
+					Text("")
 			}
 		}
 		.frame(width: 300, height: 310)
@@ -102,28 +96,26 @@ struct Modulewrapper: View {
 			ZStack {
 				if tapped {
 					// Module selection overlay
-					VStack {
-						Grid(horizontalSpacing: 20, verticalSpacing: 20) {
-							GridRow {
-								Button(action: { setModule(mod: .vlong2short) }, label: { Image("module.vLongTwoShort") })
-								Button(action: { setModule(mod: .twoshorthlong) }, label: { Image("module.twoShortHLong") })
-								Button(action: { setModule(mod: .twoshortvlong) }, label: { Image("module.twoShortVLong") })
-								Button(action: { setModule(mod: .vlongtwoshort) }, label: { Image("module.hLongTwoShort") })
-							}
-							GridRow {
-								Button(action: { setModule(mod: .fourshort) }, label: { Image("module.fourShort") })
-								Button(action: { setModule(mod: .oncecell) }, label: { Image("module.square") })
-								Button(action: { setModule(mod: .twovlong) }, label: { Image("module.twoVLong") })
-								Button(action: { setModule(mod: .twohlong) }, label: { Image("module.twoHLong") })
-							}
+					Grid(horizontalSpacing: 20, verticalSpacing: 20) {
+						GridRow {
+							Button(action: { setModule(mod: .vlong2short) }, label: { Image("module.vLongTwoShort") })
+							Button(action: { setModule(mod: .twoshorthlong) }, label: { Image("module.twoShortHLong") })
+							Button(action: { setModule(mod: .twoshortvlong) }, label: { Image("module.twoShortVLong") })
+							Button(action: { setModule(mod: .vlongtwoshort) }, label: { Image("module.hLongTwoShort") })
 						}
-						.padding()
+						GridRow {
+							Button(action: { setModule(mod: .fourshort) }, label: { Image("module.fourShort") })
+							Button(action: { setModule(mod: .oncecell) }, label: { Image("module.square") })
+							Button(action: { setModule(mod: .twovlong) }, label: { Image("module.twoVLong") })
+							Button(action: { setModule(mod: .twohlong) }, label: { Image("module.twoHLong") })
+						}
 					}
-					.background(Material.ultraThin)
+					.padding()
+					.background(.ultraThinMaterial)
 					.clipShape(RoundedRectangle(cornerRadius: 10))
 					.frame(width: 200, height: 310)
-					.clipped()
-					
+				} else {
+					EmptyView().frame(width: 200, height: 310)
 				}
 			}.onTapGesture { tapped = false }
 		)

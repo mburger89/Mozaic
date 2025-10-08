@@ -1,10 +1,10 @@
 import Foundation
-import UniformTypeIdentifiers
 import SwiftUI
-import Observation
 
-
-
+struct mbRow {
+	var module: modules
+	var image: [Image]
+}
 
 @Observable
 class ProjectModel {

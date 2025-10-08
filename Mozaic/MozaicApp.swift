@@ -26,7 +26,6 @@ struct MozaicApp: App {
     var body: some Scene {
         WindowGroup {
 			ContentView()
-				.environment(ProjectModel())
 				.modelContainer(sharedModelContainer)
 //			#if os(macOS)
 //				.frame(minWidth: 1300)

@@ -17,9 +17,11 @@ struct mbImage: View {
 			.clipShape(RoundedRectangle(cornerRadius: 10.0))
 			.dropDestination(for: Image.self, action: {items, location in
 				pm.writeToModel(items: items, indexs: indexes)
+				print("drop destimation called")
 				return true
 			}, isTargeted: { target in
 				isTarget = target
+				print("target called")
 			})
 			.draggable(imgSlot, preview: { imgSlot.frame(width: (imgWidth / 2), height: (imgHeight / 2))
 				.clipShape(RoundedRectangle(cornerRadius: 10.0)) })
