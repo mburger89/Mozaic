@@ -13,8 +13,7 @@ struct mbImage: View {
 			.aspectRatio(contentMode: .fill)
 			.frame(width: imgWidth, height: imgHeight)
 			.background(Material.thin)
-			.contentShape(RoundedRectangle(cornerRadius: 10).inset(by: 20))
-			.clipShape(RoundedRectangle(cornerRadius: 10.0))
+			.contentShape(RoundedRectangle(cornerRadius: pm.cellRadius).inset(by: 20))
 			.dropDestination(for: Image.self, action: {items, location in
 				pm.writeToModel(items: items, indexs: indexes)
 				return true
@@ -23,13 +22,15 @@ struct mbImage: View {
 			})
 			.draggable(imgSlot, preview: {
 				imgSlot.frame(width: (imgWidth / 2), height: (imgHeight / 2))
-					.clipShape(RoundedRectangle(cornerRadius: 10.0))
+					.clipShape(RoundedRectangle(cornerRadius: pm.cellRadius))
 			})
 			.overlay {
-				RoundedRectangle(cornerRadius: 10)
+				RoundedRectangle(cornerRadius: pm.cellRadius)
 					.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)
 					.frame(width: imgWidth, height: imgHeight)
 			}
+			.clipShape(RoundedRectangle(cornerRadius: pm.cellRadius))
+			.mask(RoundedRectangle(cornerRadius: pm.cellRadius))
 	}
 }
 
