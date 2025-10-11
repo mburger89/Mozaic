@@ -122,7 +122,7 @@ struct Modulewrapper: View {
 			.frame(width: 300, height: 300)
 			
 		)
-		.onLongPressGesture(minimumDuration: 0.10) {
+		.onLongPressGesture(minimumDuration: 0.30) {
 			tapped = true
 		}
 	}
@@ -136,5 +136,13 @@ struct Modulewrapper: View {
 #Preview {
 	let cellWidth: CGFloat = 155
 	let twoCellWidth: CGFloat = 155 * 2
-	Modulewrapper(mbcell: mbCell(cellSpacing: 10, cell: cellWidth, twoCell: (twoCellWidth + 10) , img: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")], index: 0)).environment(ProjectModel())
+	let image: Image = Image("OGbgImg")
+	Modulewrapper(
+		mbcell: mbCell(
+			cellSpacing: 10,
+			cell: cellWidth,
+			twoCell: (twoCellWidth + 10) ,
+			img: [image,image,image,image],
+			index: 0
+	)).environment(ProjectModel())
 }
