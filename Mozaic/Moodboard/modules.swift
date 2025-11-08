@@ -109,9 +109,9 @@ struct TwoHLong: View {
 			VStack(){
 				Vlong2Short(
 					mbcell: mbCell(
-                    cellSpacing: 0,
-					cell: 155.0,
-					twoCell: (155 * 2) + 0,
+                    cellSpacing: 10,
+					cell: 150.0,
+					twoCell: (150 * 2) + 10,
 					img: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")],
 					index: 0
 					)

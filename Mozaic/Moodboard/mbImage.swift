@@ -20,10 +20,14 @@ struct mbImage: View {
 			}, isTargeted: { target in
 				isTarget = target
 			})
-			.draggable(imgSlot, preview: {
-				imgSlot.frame(width: (imgWidth / 2), height: (imgHeight / 2))
-					.clipShape(RoundedRectangle(cornerRadius: pm.cellRadius))
-			})
+			.draggable(imgSlot) {
+					imgSlot
+						.resizable()
+						.aspectRatio(contentMode: .fill)
+						.frame(width: imgWidth / 2, height: imgHeight / 2)
+						.contentShape(.dragPreview, RoundedRectangle(cornerRadius: pm.cellRadius))
+						.mask(RoundedRectangle(cornerRadius: pm.cellRadius))
+			}
 			.overlay {
 				RoundedRectangle(cornerRadius: pm.cellRadius)
 					.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)

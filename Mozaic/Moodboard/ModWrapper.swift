@@ -122,7 +122,7 @@ struct Modulewrapper: View {
 			.frame(width: 300, height: 300)
 			
 		)
-		.onLongPressGesture(minimumDuration: 0.30) {
+		.onLongPressGesture(minimumDuration: 0.50) {
 			tapped = true
 		}
 	}
