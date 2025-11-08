@@ -28,7 +28,6 @@ class ProjectModel {
 		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
 		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
 	]
-	
 // MARK: mood functions
     func writeToModel(items:[Image], indexs: [Int]) {
         self.imgC[indexs[0]].image[indexs[1]] = items[0]

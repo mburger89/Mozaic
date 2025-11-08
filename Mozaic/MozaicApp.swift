@@ -27,9 +27,6 @@ struct MozaicApp: App {
         WindowGroup {
 			ContentView()
 				.modelContainer(sharedModelContainer)
-			#if os(macOS)
-				.frame(minWidth: 1600)
-			#endif
         }
     }
 }

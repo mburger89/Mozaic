@@ -39,21 +39,24 @@ struct ContentView: View {
 	@State private var fileexporting: Bool = false
 	var body: some View {
 		NavigationSplitView {
-			ScrollView(.vertical) {
-//					ForEach(0...50, id: \.self) { i in Text("Sidebar \(i)") }
-				}
+			ScrollView(.vertical) {}
 			.frame(minWidth: 225)
 			.navigationTitle("MoodBoard Title")
 		} detail: {
-			MoodBoardMain()
-				.environment(pm)
+			ScrollView (.horizontal){
+				MoodBoardMain()
+					.environment(pm)
+					.containerRelativeFrame(.horizontal)
+			}
 				.toolbar {
 					ToolbarItemGroup(placement: .primaryAction) {
-						Button(action: {importing = true}, label: {Image(systemName: "square.and.arrow.down")}).fileImporter(
+						Button(
+							action: {importing = true},
+							label: {Image(systemName: "square.and.arrow.down")}
+						).fileImporter(
 							isPresented: $importing,
 							allowedContentTypes: [.jpeg,.png,.gif,.tiff,.heic]
 						) { result in
-							print("file import called")
 							switch result {
 								case .success(let file):
 									let access = file.startAccessingSecurityScopedResource()
@@ -64,8 +67,7 @@ struct ContentView: View {
 											if let uiImage = UIImage(data: data) {
 												pm.selectedPHImages.append(Image(uiImage: uiImage))
 											}
-#endif
-											
+#endif // os(iOS)
 #if os(macOS)
 											if let nsImage = NSImage(data: data) {
 												pm.selectedPHImages.append(Image(nsImage: nsImage))
@@ -94,7 +96,6 @@ struct ContentView: View {
 								}
 							}
 						}
-						
 						//				MARK: Render out Mood Board
 						Button("\(Image(systemName: "arrow.down.document.fill"))") {
 							fileexporting = true
@@ -125,8 +126,14 @@ struct ContentView: View {
 				}
 		}
 		.inspector(isPresented: $showSettings) {
-			bottomBar(images: pm.selectedPHImages)
-//				.inspectorColumnWidth(min: 150, ideal: 250, max: 400)
+			TabView {
+				Tab("images", systemImage: "photo") {
+					bottomBar(images: pm.selectedPHImages)
+				}
+				Tab("Controls", systemImage: "gear") {
+					BoardSettings(pm: $pm)
+				}
+			}.tabViewStyle(.grouped)
 		}
 	}
 	
