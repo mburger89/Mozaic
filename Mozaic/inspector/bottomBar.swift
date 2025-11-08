@@ -10,23 +10,25 @@ import PhotosUI
 
 struct bottomBar: View {
 	let images: [Image]
-	let gridItemWith = 150.0
+	let gridItemWith = 225.0
+	let gridItemHeight = 150.0
 	var body: some View {
 		ScrollView(.vertical) {
 			LazyVGrid(columns: [GridItem(.fixed(gridItemWith))], spacing: 10.0){
-				ForEach(0..<images.count, id: \.self) { i in
-					images[i]
+				ForEach(images.enumerated(), id: \.offset) { _, i in
+					i
+					.resizable()
+					.aspectRatio(contentMode: .fill)
+					.frame( width: gridItemWith, height: gridItemHeight)
+					.background(Material.thin)
+					.clipShape(RoundedRectangle(cornerRadius: 10.0))
+					.draggable(i) {
+						i
 						.resizable()
-						.scaledToFill()
-						.frame( width: gridItemWith, height: gridItemWith)
-						.background(Material.thin)
-						.clipShape(RoundedRectangle(cornerRadius: 10.0))
-					//								.mask{RoundedRectangle(cornerRadius: 10).frame(width: gridItemWith, height: gridItemWith)}
-						.draggable(images[i], preview: {
-							images[i]
-								.frame(width: 100, height: 100)
-								.clipShape(RoundedRectangle(cornerRadius: 10.0))
-						})
+						.aspectRatio(contentMode: .fill)
+						.frame(width: gridItemWith / 2.0, height: gridItemHeight / 2.0)
+						.contentShape(.dragPreview, RoundedRectangle(cornerRadius: 10))
+						}
 				}
 			}
 		}
