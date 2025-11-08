@@ -133,7 +133,10 @@ struct ContentView: View {
 				Tab("Controls", systemImage: "gear") {
 					BoardSettings(pm: $pm)
 				}
-			}.tabViewStyle(.grouped)
+			}
+			#if os(macOS)
+			.tabViewStyle(.grouped)
+			#endif
 		}
 	}
 	
