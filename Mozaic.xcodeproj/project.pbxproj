@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		73383CC02CFA9197007150D7 /* modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* modules.swift */; };
+		73383CC02CFA9197007150D7 /* Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* Modules.swift */; };
 		73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB22CFA9197007150D7 /* ProjectModel.swift */; };
 		73383CC32CFA9197007150D7 /* MoodBoardMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB92CFA9197007150D7 /* MoodBoardMain.swift */; };
-		73383CC62CFA9197007150D7 /* mbImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB42CFA9197007150D7 /* mbImage.swift */; };
+		73383CC62CFA9197007150D7 /* MbImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB42CFA9197007150D7 /* MbImage.swift */; };
 		738136D12EAAD24E0079CFBD /* BoardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738136D02EAAD24E0079CFBD /* BoardSettings.swift */; };
 		73BFA4D62E7BCF690089A265 /* MDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BFA4D52E7BCF690089A265 /* MDataModel.swift */; };
 		73BFA4DB2E7BD86A0089A265 /* bottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BFA4DA2E7BD86A0089A265 /* bottomBar.swift */; };
 		73E9A6CE2E8E45E50083CF99 /* Mozaic_temp.icon in Resources */ = {isa = PBXBuildFile; fileRef = 73E9A6CD2E8E45E50083CF99 /* Mozaic_temp.icon */; };
-		73E9A6D32E9075B20083CF99 /* bottom_info.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D22E9075B20083CF99 /* bottom_info.swift */; };
+		73E9A6D32E9075B20083CF99 /* Bottominfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D22E9075B20083CF99 /* Bottominfo.swift */; };
 		73E9A6D62E9076BB0083CF99 /* ModWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */; };
 		D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */; };
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
@@ -42,14 +42,14 @@
 
 /* Begin PBXFileReference section */
 		73383CB22CFA9197007150D7 /* ProjectModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectModel.swift; sourceTree = "<group>"; };
-		73383CB42CFA9197007150D7 /* mbImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mbImage.swift; sourceTree = "<group>"; };
-		73383CB52CFA9197007150D7 /* modules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modules.swift; sourceTree = "<group>"; };
+		73383CB42CFA9197007150D7 /* MbImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MbImage.swift; sourceTree = "<group>"; };
+		73383CB52CFA9197007150D7 /* Modules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modules.swift; sourceTree = "<group>"; };
 		73383CB92CFA9197007150D7 /* MoodBoardMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodBoardMain.swift; sourceTree = "<group>"; };
 		738136D02EAAD24E0079CFBD /* BoardSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardSettings.swift; sourceTree = "<group>"; };
 		73BFA4D52E7BCF690089A265 /* MDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDataModel.swift; sourceTree = "<group>"; };
 		73BFA4DA2E7BD86A0089A265 /* bottomBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottomBar.swift; sourceTree = "<group>"; };
 		73E9A6CD2E8E45E50083CF99 /* Mozaic_temp.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Mozaic_temp.icon; sourceTree = "<group>"; };
-		73E9A6D22E9075B20083CF99 /* bottom_info.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottom_info.swift; sourceTree = "<group>"; };
+		73E9A6D22E9075B20083CF99 /* Bottominfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bottominfo.swift; sourceTree = "<group>"; };
 		73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModWrapper.swift; sourceTree = "<group>"; };
 		D86BB69D2BF67EF00054AC82 /* Mozaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mozaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MozaicApp.swift; sourceTree = "<group>"; };
@@ -98,10 +98,10 @@
 		73383CB62CFA9197007150D7 /* Moodboard */ = {
 			isa = PBXGroup;
 			children = (
-				73383CB42CFA9197007150D7 /* mbImage.swift */,
-				73383CB52CFA9197007150D7 /* modules.swift */,
+				73383CB42CFA9197007150D7 /* MbImage.swift */,
+				73383CB52CFA9197007150D7 /* Modules.swift */,
 				73383CB92CFA9197007150D7 /* MoodBoardMain.swift */,
-				73E9A6D22E9075B20083CF99 /* bottom_info.swift */,
+				73E9A6D22E9075B20083CF99 /* Bottominfo.swift */,
 				73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */,
 			);
 			path = Moodboard;
@@ -289,15 +289,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				73383CC02CFA9197007150D7 /* modules.swift in Sources */,
+				73383CC02CFA9197007150D7 /* Modules.swift in Sources */,
 				73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */,
 				73383CC32CFA9197007150D7 /* MoodBoardMain.swift in Sources */,
 				738136D12EAAD24E0079CFBD /* BoardSettings.swift in Sources */,
 				73BFA4DB2E7BD86A0089A265 /* bottomBar.swift in Sources */,
-				73E9A6D32E9075B20083CF99 /* bottom_info.swift in Sources */,
+				73E9A6D32E9075B20083CF99 /* Bottominfo.swift in Sources */,
 				73BFA4D62E7BCF690089A265 /* MDataModel.swift in Sources */,
 				73E9A6D62E9076BB0083CF99 /* ModWrapper.swift in Sources */,
-				73383CC62CFA9197007150D7 /* mbImage.swift in Sources */,
+				73383CC62CFA9197007150D7 /* MbImage.swift in Sources */,
 				D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */,
 				D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */,
 			);

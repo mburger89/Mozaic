@@ -1,7 +1,8 @@
 import SwiftUI
 
-struct mbImage: View {
-	@Environment(ProjectModel.self) private var pm
+struct MbImage: View {
+//	@Environment(ProjectModel.self) private var pm
+	var pm: ProjectModel
 	@State private var isTarget: Bool = false
 	var imgSlot: Image
 	let imgWidth: CGFloat
@@ -39,7 +40,8 @@ struct mbImage: View {
 }
 
 #Preview {
-	mbImage(
+	MbImage(
+		pm: ProjectModel(),
 		imgSlot: Image("OGbgImg"),
 		imgWidth: 150.0,
 		imgHeight: (150.0 * 2),

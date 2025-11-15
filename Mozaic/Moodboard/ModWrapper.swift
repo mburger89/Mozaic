@@ -72,21 +72,21 @@ struct Modulewrapper: View {
 			// Main module content
 			switch(pm.imgC[mbcell.index].module) {
 				case .vlong2short:
-					Vlong2Short(mbcell: mbcell)
+					Vlong2Short(pm: pm, mbcell: mbcell)
 				case .twoshorthlong:
-					TwoShortHlong(mbcell: mbcell)
+					TwoShortHlong(pm: pm, mbcell: mbcell)
 				case .twoshortvlong:
-					TwoShortVlong(mbcell: mbcell)
+					TwoShortVlong(pm: pm, mbcell: mbcell)
 				case .vlongtwoshort:
-					VlongTwoShort(mbcell: mbcell)
+					VlongTwoShort(pm: pm, mbcell: mbcell)
 				case .fourshort:
-					FourShort(mbcell: mbcell)
+					FourShort(pm: pm, mbcell: mbcell)
 				case .oncecell:
-					OneCell(mbcell: mbcell)
+					OneCell(pm: pm, mbcell: mbcell)
 				case .twovlong:
-					TwoVLong(mbcell: mbcell)
+					TwoVLong(pm: pm, mbcell: mbcell)
 				case .twohlong:
-					TwoHLong(mbcell: mbcell)
+					TwoHLong(pm: pm, mbcell: mbcell)
 				case _:
 					EmptyView()
 			}

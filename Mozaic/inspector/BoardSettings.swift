@@ -36,10 +36,20 @@ struct BoardSettings: View {
 			}
 			HStack{
 				Slider(value: $pm.gridGap, in: 0...30)
-//				Text("\(pm.gridGap.rounded().formatted())")
 				TextField("grid gap", value: $pm.gridGap, formatter: gridGapFormatter)
-					.frame(width:100)
+					.frame(width:75)
 					.textFieldStyle(.roundedBorder)
+			}
+			Section {
+				Toggle("\(Image(systemName: "inset.filled.bottomhalf.tophalf.rectangle")) Board info", isOn: $pm.showBoardInfo)
+				Text("Project Name")
+				TextField("Project Name", text: $pm.projectName)
+					.textFieldStyle(RoundedBorderTextFieldStyle())
+					.border(Color.gray)
+				Text("Created By")
+				TextField("Created By", text: $pm.createdBy)
+					.textFieldStyle(RoundedBorderTextFieldStyle())
+					.border(Color.gray)
 			}
 			Spacer()
 		}.padding()
