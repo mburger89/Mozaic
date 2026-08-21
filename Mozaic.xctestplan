@@ -24,14 +24,6 @@
         "identifier" : "D86BB6AF2BF67EF10054AC82",
         "name" : "MozaicTests"
       }
-    },
-    {
-      "parallelizable" : true,
-      "target" : {
-        "containerPath" : "container:Mozaic.xcodeproj",
-        "identifier" : "D86BB6B92BF67EF10054AC82",
-        "name" : "MozaicUITests"
-      }
     }
   ],
   "version" : 1

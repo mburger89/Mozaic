@@ -46,17 +46,6 @@
                ReferencedContainer = "container:Mozaic.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D86BB6B92BF67EF10054AC82"
-               BuildableName = "MozaicUITests.xctest"
-               BlueprintName = "MozaicUITests"
-               ReferencedContainer = "container:Mozaic.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
