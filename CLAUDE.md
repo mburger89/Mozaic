@@ -28,7 +28,12 @@ xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS
 xcodebuild ... test -only-testing:MozaicTests/MozaicTests/testExample
 ```
 
-**`test` currently fails at `Command CodeSign failed` while signing the macOS UI-test runner — this is pre-existing and unrelated to app code** (it reproduces on a clean checkout). It is a signing/provisioning problem, not a compile or assertion failure, so don't go hunting for it in Swift sources. `build` is the reliable signal until it is fixed. `MozaicTests` is still XCTest boilerplate with no real assertions.
+**`test` does not currently run on either platform, and the cause is not signing.** The three test source files exist on disk but are not in the Xcode project — no `PBXFileReference`, no `PBXSourcesBuildPhase` entry — so both test targets compile zero files and produce bundles with no executable. The symptom differs by platform and is misleading on macOS:
+
+- iPadOS: `Failed to load the test bundle … its executable couldn't be located`
+- macOS: `Command CodeSign failed` (signing an empty bundle)
+
+The suite has never run since the project was created. Fixing it means adding the files to their targets. Until then `build` is the only reliable signal. See "Adding or renaming files" — this is that hazard in the wild.
 
 A change that compiles on macOS can still break iOS — much of the image/render code is behind `#if os(macOS)` / `#if os(iOS)`, and only one branch is type-checked per destination. Build both after touching anything image- or export-related.
 
