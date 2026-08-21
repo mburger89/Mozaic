@@ -30,6 +30,9 @@ final class ImageStore {
 
 	/// Not observed: filling the cache must not invalidate views.
 	@ObservationIgnored private var decoded: [UUID: Image] = [:]
+	/// IDs whose bytes failed to decode, so a corrupt image is not retried
+	/// on every render pass. See `image(for:)`.
+	@ObservationIgnored private var decodeFailures: Set<UUID> = []
 	/// Test-only counter proving memoization holds.
 	@ObservationIgnored private(set) var decodeCountForTesting = 0
 
@@ -52,27 +55,55 @@ final class ImageStore {
 	}
 
 	/// Inserts an image whose ID is already known, used when reading a document.
+	///
+	/// Bytes are immutable once stored under an ID: `MozaicDocument`'s
+	/// incremental save reuses an existing file wrapper whenever the
+	/// filename matches, on the premise that a filename implies its
+	/// contents. So this is insert-if-absent — if `id` is already present,
+	/// the existing entry wins and the new bytes are discarded. Reaching
+	/// that branch is a programming error, not a user-facing one; a debug
+	/// build logs it instead of trapping, so a single bad call can't take
+	/// down a document-read pass (or, here, a test run) entirely.
 	func insert(_ image: StoredImage, for id: UUID) {
+		guard storedImages[id] == nil else {
+			#if DEBUG
+			print("ImageStore.insert(_:for:) called for an ID that already has stored bytes (\(id)). Bytes are immutable once stored under an ID -- keeping the existing entry.")
+			#endif
+			return
+		}
 		storedImages[id] = image
 		decoded[id] = nil
+		decodeFailures.remove(id)
 	}
 
 	func remove(_ id: UUID) {
 		storedImages[id] = nil
 		decoded[id] = nil
+		decodeFailures.remove(id)
 	}
 
 	/// The decoded image, decoded at most once per ID per session.
+	///
+	/// A decode failure is memoized too: `insert(_:for:)` is the
+	/// document-read path and takes unvalidated bytes straight from disk,
+	/// so a single corrupt image must not be retried on every render pass.
 	func image(for id: UUID) -> Image? {
 		if let cached = decoded[id] { return cached }
 		guard let stored = storedImages[id] else { return nil }
+		guard !decodeFailures.contains(id) else { return nil }
 
 		decodeCountForTesting += 1
 		#if os(macOS)
-		guard let native = NSImage(data: stored.data) else { return nil }
+		guard let native = NSImage(data: stored.data) else {
+			decodeFailures.insert(id)
+			return nil
+		}
 		let image = Image(nsImage: native)
 		#else
-		guard let native = UIImage(data: stored.data) else { return nil }
+		guard let native = UIImage(data: stored.data) else {
+			decodeFailures.insert(id)
+			return nil
+		}
 		let image = Image(uiImage: native)
 		#endif
 

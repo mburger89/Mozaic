@@ -81,4 +81,41 @@ import UniformTypeIdentifiers
 			try store.add(Data("nope".utf8), quality: .standard)
 		}
 	}
+
+	@Test func corruptStoredBytesDoNotReDecodeOnEveryCall() {
+		// insert(_:for:) is the document-read path: it takes unvalidated
+		// bytes straight from disk, so a corrupt image is reachable here in
+		// a way add() (which validates through ImageCoder.prepared) cannot
+		// produce. A failed decode must be memoized too, or a single
+		// corrupt image in a shared board reintroduces per-render decoding.
+		let store = ImageStore()
+		let id = UUID()
+		store.insert(StoredImage(data: Data("not an image".utf8),
+								 contentType: .png,
+								 pixelWidth: 40,
+								 pixelHeight: 30),
+					for: id)
+
+		#expect(store.image(for: id) == nil)
+		#expect(store.image(for: id) == nil)
+		#expect(store.image(for: id) == nil)
+		#expect(store.decodeCountForTesting <= 1)
+	}
+
+	@Test func insertDoesNotOverwriteExistingBytesForAnID() throws {
+		// Bytes are immutable once stored under an ID: MozaicDocument's
+		// incremental save reuses an existing file wrapper whenever the
+		// filename matches, on the premise that a filename implies its
+		// contents. insert(_:for:) must be insert-if-absent so that
+		// invariant cannot be silently broken.
+		let store = ImageStore()
+		let id = UUID()
+		let dataA = try makeImage(width: 40)
+		let dataB = try makeImage(width: 50)
+
+		store.insert(StoredImage(data: dataA, contentType: .png, pixelWidth: 40, pixelHeight: 30), for: id)
+		store.insert(StoredImage(data: dataB, contentType: .png, pixelWidth: 50, pixelHeight: 30), for: id)
+
+		#expect(store.stored(for: id)?.data == dataA)
+	}
 }
