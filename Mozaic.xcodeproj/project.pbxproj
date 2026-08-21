@@ -12,6 +12,7 @@
 		24B6042EE6CA41313DFA86F5 /* ImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A3D430387C325D368C32D8 /* ImageStore.swift */; };
 		523BFFF17FB002588602C004 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A003C8F24B216C56DD155 /* SmokeTests.swift */; };
 		59B4EFBDFE35847FFE9B297D /* ImageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */; };
+		59BE0FEFD0DADB0840F1C5EE /* MozaicDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35646706C2262B55828E7FAD /* MozaicDocument.swift */; };
 		73383CC02CFA9197007150D7 /* Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* Modules.swift */; };
 		73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB22CFA9197007150D7 /* ProjectModel.swift */; };
 		73383CC32CFA9197007150D7 /* MoodBoardMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB92CFA9197007150D7 /* MoodBoardMain.swift */; };
@@ -23,12 +24,14 @@
 		73E9A6D32E9075B20083CF99 /* Bottominfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D22E9075B20083CF99 /* Bottominfo.swift */; };
 		73E9A6D62E9076BB0083CF99 /* ModWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */; };
 		8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35860FD3503293935E5EF01 /* BoardManifest.swift */; };
+		B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */; };
 		BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */; };
 		C42603667FCBE9E1CACF4026 /* MozaicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1026FFECF9D0447E26238E /* MozaicUITests.swift */; };
 		D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */; };
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
 		D86BB6A72BF67EF10054AC82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6A62BF67EF10054AC82 /* Assets.xcassets */; };
 		D86BB6AB2BF67EF10054AC82 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6AA2BF67EF10054AC82 /* Preview Assets.xcassets */; };
+		DAA36D6AF24E988192102B80 /* UTType+Mozaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */; };
 		FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6A6429C384F741DB44215D /* ImageCoderTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +54,9 @@
 
 /* Begin PBXFileReference section */
 		04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageStoreTests.swift; path = MozaicTests/ImageStoreTests.swift; sourceTree = "<group>"; };
+		33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UTType+Mozaic.swift"; path = "Document/UTType+Mozaic.swift"; sourceTree = "<group>"; };
+		35646706C2262B55828E7FAD /* MozaicDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocument.swift; path = Document/MozaicDocument.swift; sourceTree = "<group>"; };
+		4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocumentTests.swift; path = MozaicTests/MozaicDocumentTests.swift; sourceTree = "<group>"; };
 		54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifestTests.swift; path = MozaicTests/BoardManifestTests.swift; sourceTree = "<group>"; };
 		64A3D430387C325D368C32D8 /* ImageStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageStore.swift; path = Document/ImageStore.swift; sourceTree = "<group>"; };
 		668A003C8F24B216C56DD155 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmokeTests.swift; path = MozaicTests/SmokeTests.swift; sourceTree = "<group>"; };
@@ -111,6 +117,7 @@
 				54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */,
 				7A6A6429C384F741DB44215D /* ImageCoderTests.swift */,
 				04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */,
+				4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -160,6 +167,8 @@
 				C35860FD3503293935E5EF01 /* BoardManifest.swift */,
 				9275C19F2D9AF47998246CB6 /* ImageCoder.swift */,
 				64A3D430387C325D368C32D8 /* ImageStore.swift */,
+				33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */,
+				35646706C2262B55828E7FAD /* MozaicDocument.swift */,
 			);
 			name = Document;
 			sourceTree = "<group>";
@@ -354,6 +363,8 @@
 				8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */,
 				1290254C5EB69255FD232DCC /* ImageCoder.swift in Sources */,
 				24B6042EE6CA41313DFA86F5 /* ImageStore.swift in Sources */,
+				DAA36D6AF24E988192102B80 /* UTType+Mozaic.swift in Sources */,
+				59BE0FEFD0DADB0840F1C5EE /* MozaicDocument.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +376,7 @@
 				BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */,
 				FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */,
 				59B4EFBDFE35847FFE9B297D /* ImageStoreTests.swift in Sources */,
+				B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
