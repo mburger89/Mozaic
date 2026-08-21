@@ -8,14 +8,7 @@
 import SwiftUI
 
 struct BoardSettings: View {
-	@Binding var pm : ProjectModel
-
-	private let gridGapFormatter: NumberFormatter = {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.maximumFractionDigits = 1
-		return formatter
-	}()
+	@Bindable var pm: ProjectModel
 
     var body: some View {
 		VStack(alignment: .leading) {
@@ -26,7 +19,7 @@ struct BoardSettings: View {
 			}
 			HStack {
 				Slider(value: $pm.cellRadius, in: 0...50)
-				Text("\(pm.cellRadius.rounded().formatted())")
+				Text(pm.cellRadius.rounded(), format: .number)
 			}
 //
 			Label {
@@ -36,19 +29,21 @@ struct BoardSettings: View {
 			}
 			HStack{
 				Slider(value: $pm.gridGap, in: 0...30)
-				TextField("grid gap", value: $pm.gridGap, formatter: gridGapFormatter)
+				TextField("grid gap", value: $pm.gridGap, format: .number.precision(.fractionLength(0...1)))
 					.frame(width:75)
 					.textFieldStyle(.roundedBorder)
 			}
 			Section {
-				Toggle("\(Image(systemName: "inset.filled.bottomhalf.tophalf.rectangle")) Board info", isOn: $pm.showBoardInfo)
+				Toggle(isOn: $pm.showBoardInfo) {
+					Label("Board info", systemImage: "inset.filled.bottomhalf.tophalf.rectangle")
+				}
 				Text("Project Name")
 				TextField("Project Name", text: $pm.projectName)
-					.textFieldStyle(RoundedBorderTextFieldStyle())
+					.textFieldStyle(.roundedBorder)
 					.border(Color.gray)
 				Text("Created By")
 				TextField("Created By", text: $pm.createdBy)
-					.textFieldStyle(RoundedBorderTextFieldStyle())
+					.textFieldStyle(.roundedBorder)
 					.border(Color.gray)
 			}
 			Spacer()
@@ -57,5 +52,5 @@ struct BoardSettings: View {
 }
 
 #Preview {
-	BoardSettings(pm: .constant(ProjectModel()))
+	BoardSettings(pm: ProjectModel())
 }

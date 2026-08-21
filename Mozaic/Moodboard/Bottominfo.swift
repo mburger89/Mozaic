@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct BottomInfo: View {
-	let Name: String
-	let CreatedBy: String
+	let name: String
+	let createdBy: String
     var body: some View {
 		HStack {
 			VStack(alignment: .leading) {
-				Text(Name)
+				Text(name)
 					.font(.title2)
 					.padding(.leading, 10)
-				Text(CreatedBy)
+				Text(createdBy)
 					.font(.subheadline)
 					.padding(.leading, 10)
 			}
@@ -24,10 +24,10 @@ struct BottomInfo: View {
 		}
 		.frame(maxHeight: 75)
 		.background(.regularMaterial)
-		.cornerRadius(10)
+		.clipShape(.rect(cornerRadius: 10))
     }
 }
 
 #Preview {
-	BottomInfo(Name: "Untitled Project", CreatedBy:"Ananomys").padding()
+	BottomInfo(name: "Untitled Project", createdBy: "Anonymous").padding()
 }

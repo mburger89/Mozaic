@@ -50,10 +50,10 @@ struct ContentView: View {
 			}
 				.toolbar {
 					ToolbarItemGroup(placement: .primaryAction) {
-						Button(
-							action: {importing = true},
-							label: {Image(systemName: "square.and.arrow.down")}
-						).fileImporter(
+						Button("Import Image", systemImage: "square.and.arrow.down") {
+							importing = true
+						}
+						.fileImporter(
 							isPresented: $importing,
 							allowedContentTypes: [.jpeg,.png,.gif,.tiff,.heic]
 						) { result in
@@ -85,7 +85,7 @@ struct ContentView: View {
 						PhotosPicker(
 							selection: $selectedItems,
 							matching: .any(of: [.images]),
-							label: {Image(systemName: "photo.badge.plus")}
+							label: {Label("Add from Photos", systemImage: "photo.badge.plus")}
 						)
 						.onChange(of: selectedItems) {
 							Task {
@@ -97,9 +97,10 @@ struct ContentView: View {
 							}
 						}
 						//				MARK: Render out Mood Board
-						Button("\(Image(systemName: "arrow.down.document.fill"))") {
+						Button("Export Board", systemImage: "arrow.down.document.fill") {
 							fileexporting = true
-						}.fileExporter(
+						}
+						.fileExporter(
 							isPresented: $fileexporting,
 							documents: [renderMoodBoard()],
 							contentType: .png,
@@ -117,21 +118,21 @@ struct ContentView: View {
 						ShareLink(
 							items: [renderMoodBoard()],
 							preview: {_ in SharePreview("MoodBoard", image: Image("mozaic"))},
-							label: {Image(systemName: "square.and.arrow.up")}
+							label: {Label("Share Board", systemImage: "square.and.arrow.up")}
 						)
-						Button(action: {showSettings.toggle()}, label: {
-							Image(systemName: "sidebar.right")
-						})
+						Button("Toggle Inspector", systemImage: "sidebar.right") {
+							showSettings.toggle()
+						}
 					}
 				}
 		}
 		.inspector(isPresented: $showSettings) {
 			TabView {
-				Tab("images", systemImage: "photo") {
-					bottomBar(images: pm.selectedPHImages)
+				Tab("Images", systemImage: "photo") {
+					BottomBar(images: pm.selectedPHImages)
 				}
 				Tab("Controls", systemImage: "gear") {
-					BoardSettings(pm: $pm)
+					BoardSettings(pm: pm)
 				}
 			}
 			#if os(macOS)

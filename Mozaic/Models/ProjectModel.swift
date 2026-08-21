@@ -1,113 +1,105 @@
 import Foundation
 import SwiftUI
 
-struct mbRow {
+/// One row of the moodboard: a layout plus the images filling its slots.
+///
+/// Every row carries four images regardless of layout; layouts that use fewer
+/// slots simply ignore the trailing entries.
+struct MbRow: Identifiable {
 	let id: UUID = UUID()
-	var module: modules
+	var module: Module
 	var image: [Image]
 }
 
+@MainActor
 @Observable
 class ProjectModel {
-    var project_id: UUID?
+	/// Base width of a single moodboard cell before the grid gap is applied.
+	///
+	/// The module and grid frames in `ModuleWrapper` and `MoodBoardMain` are
+	/// derived from this value; changing it alone will misalign the board.
+	static let baseCellWidth: CGFloat = 155.0
+
+	var projectID: UUID?
 	var projectDescription: String = "a description of the project"
 	var projectName: String = "Untitled Project"
 	var createdBy: String = "Anonymous"
 	var showBoardInfo: Bool = true
 	var isSideBarOpen = false
-	var gridGap: CGFloat = 10.0
-	var cellRadius: CGFloat = 10.0
+	var gridGap: Double = 10.0
+	var cellRadius: Double = 10.0
 	var selectedPHImages: [Image] = []
-	
-//	MARK: Mood var
-	var imgC: [mbRow] = [
-		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		mbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-	]
-// MARK: mood functions
-    func writeToModel(items:[Image], indexs: [Int]) {
-        self.imgC[indexs[0]].image[indexs[1]] = items[0]
-    }
-	func cellwidth() -> CGFloat {
-		if self.gridGap == 0 {
-			return 155.0
-		} else {
-			return 155.0 - (self.gridGap / 2.0)
-		}
-	}
-	func twoCellWidth() -> CGFloat {
-		if self.gridGap == 0 {
-			return 155.0 * 2
-		} else {
-			return 155.0 * 2.0
-		}
-	}
-	func halfGridGap() -> CGFloat {
-		if self.gridGap == 0 {
-			return 0.0
-		} else {
-			return self.gridGap / 2.0
-		}
-	}
-    
-	#if os(iOS)
-    @MainActor
-    func imageToData(img: Image) -> Data {
-        let uiImg = ImageRenderer(content: img).uiImage
-        guard let data = uiImg?.pngData() else {
-            print("[Warning] Failed to convert UIImage to Data in imageToData")
-            return Data()
-        }
-        return data
-    }
-    
-    @MainActor
-    func multipleImgToData(img: [Image]) -> [Data] {
-        var imgArr: [Data] = []
-        for i in img {
-            let uiImg = ImageRenderer(content: i).uiImage
-            guard let data = uiImg?.pngData() else {
-                print("[Warning] Failed to convert UIImage to Data for an image in multipleImgToData")
-                imgArr.append(Data())
-                continue
-            }
-            imgArr.append(data)
-        }
-        return imgArr
-    }
-	
-    func multipleImgtoImage(img: [Data]) -> [Image] {
-        var imgList: [Image] = []
-        for i in img {
-            if let uiImage = UIImage(data: i) {
-                let img = Image(uiImage: uiImage)
-                imgList.append(img)
-            } else {
-                print("[Warning] Failed to convert Data to UIImage in multipleImgtoImage")
-            }
-        }
-        return imgList
-    }
 
-    func dataToImage(img: Data) -> Image {
-        if let uiImage = UIImage(data: img) {
-            return Image(uiImage: uiImage)
-        } else {
-            print("[Warning] Failed to convert Data to UIImage in dataToImage")
-            return Image(systemName: "photo")
-        }
-    }
+//	MARK: Mood var
+	var imgC: [MbRow] = [
+		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
+		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
+		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
+		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
+		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
+		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
+	]
+
+// MARK: mood functions
+
+	/// Width of a single cell, inset by half the grid gap so adjacent cells
+	/// keep a constant pitch as the gap changes.
+	var cellWidth: CGFloat {
+		Self.baseCellWidth - halfGridGap
+	}
+
+	/// Width of a cell spanning two columns.
+	var twoCellWidth: CGFloat {
+		Self.baseCellWidth * 2.0
+	}
+
+	var halfGridGap: CGFloat {
+		CGFloat(gridGap) / 2.0
+	}
+
+	func writeToModel(items: [Image], indexs: [Int]) {
+		self.imgC[indexs[0]].image[indexs[1]] = items[0]
+	}
+
+	#if os(iOS)
+	func imageToData(img: Image) -> Data {
+		guard let data = ImageRenderer(content: img).uiImage?.pngData() else {
+			print("[Warning] Failed to convert UIImage to Data in imageToData")
+			return Data()
+		}
+		return data
+	}
+
+	func multipleImgToData(img: [Image]) -> [Data] {
+		img.map { imageToData(img: $0) }
+	}
+
+	func multipleImgtoImage(img: [Data]) -> [Image] {
+		img.compactMap { data in
+			guard let uiImage = UIImage(data: data) else {
+				print("[Warning] Failed to convert Data to UIImage in multipleImgtoImage")
+				return nil
+			}
+			return Image(uiImage: uiImage)
+		}
+	}
+
+	func dataToImage(img: Data) -> Image {
+		guard let uiImage = UIImage(data: img) else {
+			print("[Warning] Failed to convert Data to UIImage in dataToImage")
+			return Image(systemName: "photo")
+		}
+		return Image(uiImage: uiImage)
+	}
 	#endif // os(iOS)
 	#if os(macOS)
-	@MainActor
 	func imageToData(img: Image) async -> Data {
-		let tempImg = ImageRenderer(content: img).nsImage
-		return try! await tempImg?.exported(as: .png) ?? Data()
+		guard let nsImage = ImageRenderer(content: img).nsImage,
+			  let data = try? await nsImage.exported(as: .png) else {
+			print("[Warning] Failed to export NSImage to Data in imageToData")
+			return Data()
+		}
+		return data
 	}
 	#endif // os(macOS)
 }
-

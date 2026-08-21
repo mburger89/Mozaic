@@ -8,26 +8,26 @@
 import SwiftUI
 import PhotosUI
 
-struct bottomBar: View {
+struct BottomBar: View {
 	let images: [Image]
-	let gridItemWith = 225.0
+	let gridItemWidth = 225.0
 	let gridItemHeight = 150.0
 	var body: some View {
 		ScrollView(.vertical) {
-			LazyVGrid(columns: [GridItem(.fixed(gridItemWith))], spacing: 10.0){
+			LazyVGrid(columns: [GridItem(.fixed(gridItemWidth))], spacing: 10.0){
 				ForEach(images.enumerated(), id: \.offset) { _, i in
 					i
 					.resizable()
 					.aspectRatio(contentMode: .fill)
-					.frame( width: gridItemWith, height: gridItemHeight)
+					.frame( width: gridItemWidth, height: gridItemHeight)
 					.background(Material.thin)
-					.clipShape(RoundedRectangle(cornerRadius: 10.0))
+					.clipShape(.rect(cornerRadius: 10.0))
 					.draggable(i) {
 						i
 						.resizable()
 						.aspectRatio(contentMode: .fill)
-						.frame(width: gridItemWith / 2.0, height: gridItemHeight / 2.0)
-						.contentShape(.dragPreview, RoundedRectangle(cornerRadius: 10))
+						.frame(width: gridItemWidth / 2.0, height: gridItemHeight / 2.0)
+						.contentShape(.dragPreview, .rect(cornerRadius: 10))
 						}
 				}
 			}
@@ -36,5 +36,5 @@ struct bottomBar: View {
 }
 
 #Preview {
-	bottomBar(images: [Image]())
+	BottomBar(images: [Image]())
 }

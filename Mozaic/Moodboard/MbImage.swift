@@ -14,7 +14,7 @@ struct MbImage: View {
 			.aspectRatio(contentMode: .fill)
 			.frame(width: imgWidth, height: imgHeight)
 			.background(Material.thin)
-			.contentShape(RoundedRectangle(cornerRadius: pm.cellRadius).inset(by: 20))
+			.contentShape(.rect(cornerRadius: pm.cellRadius).inset(by: 20))
 			.dropDestination(for: Image.self, action: {items, location in
 				pm.writeToModel(items: items, indexs: indexes)
 				return true
@@ -26,16 +26,15 @@ struct MbImage: View {
 						.resizable()
 						.aspectRatio(contentMode: .fill)
 						.frame(width: imgWidth / 2, height: imgHeight / 2)
-						.contentShape(.dragPreview, RoundedRectangle(cornerRadius: pm.cellRadius))
-						.mask(RoundedRectangle(cornerRadius: pm.cellRadius))
+						.contentShape(.dragPreview, .rect(cornerRadius: pm.cellRadius))
+						.clipShape(.rect(cornerRadius: pm.cellRadius))
 			}
 			.overlay {
 				RoundedRectangle(cornerRadius: pm.cellRadius)
 					.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)
 					.frame(width: imgWidth, height: imgHeight)
 			}
-			.clipShape(RoundedRectangle(cornerRadius: pm.cellRadius))
-			.mask(RoundedRectangle(cornerRadius: pm.cellRadius))
+			.clipShape(.rect(cornerRadius: pm.cellRadius))
 	}
 }
 

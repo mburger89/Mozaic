@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct mbCell {
+struct MbCell {
 	let cellSpacing: CGFloat
 	let cell: CGFloat
 	let twoCell: CGFloat
@@ -10,13 +10,13 @@ struct mbCell {
 
 struct Vlong2Short: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		HStack(spacing: mbcell.cellSpacing) {
-			MbImage(pm: pm,  imgSlot: mbcell.img[0], imgWidth: mbcell.cell, imgHeight: mbcell.twoCell, indexes: [mbcell.index, 0])
-			VStack(spacing: mbcell.cellSpacing) {
-				MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 1])
-				MbImage(pm: pm, imgSlot: mbcell.img[2], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 2])
+		HStack(spacing: mbCell.cellSpacing) {
+			MbImage(pm: pm,  imgSlot: mbCell.img[0], imgWidth: mbCell.cell, imgHeight: mbCell.twoCell, indexes: [mbCell.index, 0])
+			VStack(spacing: mbCell.cellSpacing) {
+				MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 1])
+				MbImage(pm: pm, imgSlot: mbCell.img[2], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 2])
 			}
 		}
 	}
@@ -24,41 +24,41 @@ struct Vlong2Short: View {
 
 struct TwoShortHlong: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		VStack(spacing: mbcell.cellSpacing) {
-			HStack(spacing: mbcell.cellSpacing) {
-				MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 0])
-				MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 1])
+		VStack(spacing: mbCell.cellSpacing) {
+			HStack(spacing: mbCell.cellSpacing) {
+				MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 0])
+				MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 1])
 			}
-			MbImage(pm: pm, imgSlot: mbcell.img[2], imgWidth: mbcell.twoCell, imgHeight: mbcell.cell, indexes: [mbcell.index, 2])
+			MbImage(pm: pm, imgSlot: mbCell.img[2], imgWidth: mbCell.twoCell, imgHeight: mbCell.cell, indexes: [mbCell.index, 2])
 		}
 	}
 }
 
 struct TwoShortVlong: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		HStack() {
-			VStack() {
-				MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 0])
-				MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 1])
+		HStack(spacing: mbCell.cellSpacing) {
+			VStack(spacing: mbCell.cellSpacing) {
+				MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 0])
+				MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 1])
             }
-            MbImage(pm: pm, imgSlot: mbcell.img[2], imgWidth: mbcell.cell, imgHeight: mbcell.twoCell, indexes: [mbcell.index, 2])
+            MbImage(pm: pm, imgSlot: mbCell.img[2], imgWidth: mbCell.cell, imgHeight: mbCell.twoCell, indexes: [mbCell.index, 2])
 		}
 	}
 }
 
 struct VlongTwoShort: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		VStack(spacing: mbcell.cellSpacing) {
-			MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.twoCell, imgHeight: mbcell.cell, indexes: [mbcell.index, 0])
-			HStack(spacing: mbcell.cellSpacing) {
-				MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 1])
-				MbImage(pm: pm, imgSlot: mbcell.img[2], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 2])
+		VStack(spacing: mbCell.cellSpacing) {
+			MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.twoCell, imgHeight: mbCell.cell, indexes: [mbCell.index, 0])
+			HStack(spacing: mbCell.cellSpacing) {
+				MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 1])
+				MbImage(pm: pm, imgSlot: mbCell.img[2], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 2])
 			}
 		}
 	}
@@ -66,16 +66,16 @@ struct VlongTwoShort: View {
 
 struct FourShort: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		HStack(spacing: mbcell.cellSpacing) {
-			VStack(spacing: mbcell.cellSpacing) {
-				MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 0])
-				MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 1])
+		HStack(spacing: mbCell.cellSpacing) {
+			VStack(spacing: mbCell.cellSpacing) {
+				MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 0])
+				MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 1])
 			}
-			VStack(spacing: mbcell.cellSpacing) {
-				MbImage(pm: pm, imgSlot: mbcell.img[2], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 2])
-				MbImage(pm: pm, imgSlot: mbcell.img[3], imgWidth: mbcell.cell, imgHeight: mbcell.cell, indexes: [mbcell.index, 3])
+			VStack(spacing: mbCell.cellSpacing) {
+				MbImage(pm: pm, imgSlot: mbCell.img[2], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 2])
+				MbImage(pm: pm, imgSlot: mbCell.img[3], imgWidth: mbCell.cell, imgHeight: mbCell.cell, indexes: [mbCell.index, 3])
 			}
 		}
 	}
@@ -83,42 +83,42 @@ struct FourShort: View {
 
 struct OneCell: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.twoCell, imgHeight: mbcell.twoCell, indexes: [mbcell.index, 0])
+		MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.twoCell, imgHeight: mbCell.twoCell, indexes: [mbCell.index, 0])
 	}
 }
 
 struct TwoVLong: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		HStack(spacing: mbcell.cellSpacing) {
-			MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.cell, imgHeight: mbcell.twoCell, indexes: [mbcell.index,0])
-			MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.cell, imgHeight: mbcell.twoCell, indexes: [mbcell.index,1])
+		HStack(spacing: mbCell.cellSpacing) {
+			MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.cell, imgHeight: mbCell.twoCell, indexes: [mbCell.index,0])
+			MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.cell, imgHeight: mbCell.twoCell, indexes: [mbCell.index,1])
 		}
 	}
 }
 
 struct TwoHLong: View {
 	var pm: ProjectModel
-	let mbcell: mbCell
+	let mbCell: MbCell
 	var body: some View {
-		VStack(spacing: mbcell.cellSpacing) {
-			MbImage(pm: pm, imgSlot: mbcell.img[0], imgWidth: mbcell.twoCell, imgHeight: mbcell.cell, indexes: [mbcell.index,0])
-			MbImage(pm: pm, imgSlot: mbcell.img[1], imgWidth: mbcell.twoCell, imgHeight: mbcell.cell, indexes: [mbcell.index,1])
+		VStack(spacing: mbCell.cellSpacing) {
+			MbImage(pm: pm, imgSlot: mbCell.img[0], imgWidth: mbCell.twoCell, imgHeight: mbCell.cell, indexes: [mbCell.index,0])
+			MbImage(pm: pm, imgSlot: mbCell.img[1], imgWidth: mbCell.twoCell, imgHeight: mbCell.cell, indexes: [mbCell.index,1])
 		}
 	}
 }
 
 #Preview {
-	@Previewable var pm: ProjectModel = ProjectModel()
+	@Previewable @State var pm: ProjectModel = ProjectModel()
 	ScrollView {
         HStack(alignment: .top) {
 			VStack(){
 				Vlong2Short(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
                     cellSpacing: 10,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -128,7 +128,7 @@ struct TwoHLong: View {
 				)
 				TwoShortHlong(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
 					cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -138,7 +138,7 @@ struct TwoHLong: View {
 				)
 				OneCell(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
 					cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -148,7 +148,7 @@ struct TwoHLong: View {
 				)
 				TwoHLong(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
 					cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -161,7 +161,7 @@ struct TwoHLong: View {
             VStack(){
 				TwoShortVlong(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
                     cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -171,7 +171,7 @@ struct TwoHLong: View {
                 )
 				VlongTwoShort(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
 					cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -181,7 +181,7 @@ struct TwoHLong: View {
 				)
 				FourShort(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
 					cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,
@@ -191,7 +191,7 @@ struct TwoHLong: View {
 				)
 				TwoVLong(
 					pm: pm,
-					mbcell: mbCell(
+					mbCell: MbCell(
 					cellSpacing: 10.0,
 					cell: 150.0,
 					twoCell: (150 * 2) + 10,

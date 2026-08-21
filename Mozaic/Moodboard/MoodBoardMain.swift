@@ -10,11 +10,11 @@ struct MoodBoardMain: View {
 				GridItem(.fixed(300 + pm.gridGap))],
 					  spacing: pm.gridGap) {
 				ForEach(pm.imgC.enumerated(), id: \.element.id) { index, imgC in
-					Modulewrapper(mbcell: mbCell(cellSpacing: pm.gridGap, cell: pm.cellwidth(), twoCell: pm.twoCellWidth(), img: imgC.image, index: index))
+					ModuleWrapper(mbCell: MbCell(cellSpacing: pm.gridGap, cell: pm.cellWidth, twoCell: pm.twoCellWidth, img: imgC.image, index: index))
 				}
-			}.padding(.bottom, pm.halfGridGap())
+			}.padding(.bottom, pm.halfGridGap)
 			if pm.showBoardInfo {
-				BottomInfo(Name: pm.projectName, CreatedBy: pm.createdBy)
+				BottomInfo(name: pm.projectName, createdBy: pm.createdBy)
 			}
 		}.frame(maxWidth: (300 + pm.gridGap * 1.55 ) * 3)
 	}
