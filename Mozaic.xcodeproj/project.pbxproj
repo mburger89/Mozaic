@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1290254C5EB69255FD232DCC /* ImageCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9275C19F2D9AF47998246CB6 /* ImageCoder.swift */; };
 		1DBB3B58C0A2FAE8529F8F2B /* MozaicUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */; };
 		523BFFF17FB002588602C004 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A003C8F24B216C56DD155 /* SmokeTests.swift */; };
 		73383CC02CFA9197007150D7 /* Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* Modules.swift */; };
@@ -26,6 +27,7 @@
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
 		D86BB6A72BF67EF10054AC82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6A62BF67EF10054AC82 /* Assets.xcassets */; };
 		D86BB6AB2BF67EF10054AC82 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6AA2BF67EF10054AC82 /* Preview Assets.xcassets */; };
+		FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6A6429C384F741DB44215D /* ImageCoderTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +60,8 @@
 		73E9A6CD2E8E45E50083CF99 /* Mozaic_temp.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Mozaic_temp.icon; sourceTree = "<group>"; };
 		73E9A6D22E9075B20083CF99 /* Bottominfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bottominfo.swift; sourceTree = "<group>"; };
 		73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModWrapper.swift; sourceTree = "<group>"; };
+		7A6A6429C384F741DB44215D /* ImageCoderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCoderTests.swift; path = MozaicTests/ImageCoderTests.swift; sourceTree = "<group>"; };
+		9275C19F2D9AF47998246CB6 /* ImageCoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCoder.swift; path = Document/ImageCoder.swift; sourceTree = "<group>"; };
 		C35860FD3503293935E5EF01 /* BoardManifest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifest.swift; path = Document/BoardManifest.swift; sourceTree = "<group>"; };
 		C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITestsLaunchTests.swift; path = MozaicUITests/MozaicUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		D86BB69D2BF67EF00054AC82 /* Mozaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mozaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +105,7 @@
 			children = (
 				668A003C8F24B216C56DD155 /* SmokeTests.swift */,
 				54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */,
+				7A6A6429C384F741DB44215D /* ImageCoderTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -148,6 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				C35860FD3503293935E5EF01 /* BoardManifest.swift */,
+				9275C19F2D9AF47998246CB6 /* ImageCoder.swift */,
 			);
 			name = Document;
 			sourceTree = "<group>";
@@ -340,6 +346,7 @@
 				D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */,
 				D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */,
 				8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */,
+				1290254C5EB69255FD232DCC /* ImageCoder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -349,6 +356,7 @@
 			files = (
 				523BFFF17FB002588602C004 /* SmokeTests.swift in Sources */,
 				BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */,
+				FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
