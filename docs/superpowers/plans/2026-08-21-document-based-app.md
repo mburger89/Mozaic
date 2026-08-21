@@ -675,15 +675,15 @@ The single owner of image bytes, and the only thing views ask for images. **The 
 **Interfaces:**
 - Produces:
   - `@MainActor @Observable final class ImageStore`
-  - `init(stored: [UUID: StoredImage] = [:])`
+  - `init(storedImages: [UUID: StoredImage] = [:])`
   - `struct StoredImage: Sendable { var data: Data; var contentType: UTType; var pixelWidth: Int; var pixelHeight: Int }`
   - `func add(_ data: Data, quality: ImageQuality) throws -> UUID`
   - `func image(for: UUID) -> Image?` — memoized
   - `func stored(for: UUID) -> StoredImage?`
-  - `var allStored: [UUID: StoredImage]`
+  - `var storedImages: [UUID: StoredImage]` (read-only outside the store)
   - `func metadata(for ids: Set<UUID>) -> [StoredImageMeta]`
   - `func filename(for id: UUID) -> String?`
-- Task 5 reads `allStored` for the snapshot; Task 6's views call `image(for:)`.
+- Task 5 reads `storedImages` for the snapshot; Task 6's views call `image(for:)`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -814,48 +814,46 @@ struct StoredImage: Sendable {
 @MainActor
 @Observable
 final class ImageStore {
-	private(set) var stored: [UUID: StoredImage]
+	private(set) var storedImages: [UUID: StoredImage]
 
 	/// Not observed: filling the cache must not invalidate views.
 	@ObservationIgnored private var decoded: [UUID: Image] = [:]
 	/// Test-only counter proving memoization holds.
 	@ObservationIgnored private(set) var decodeCountForTesting = 0
 
-	init(stored: [UUID: StoredImage] = [:]) {
-		self.stored = stored
+	init(storedImages: [UUID: StoredImage] = [:]) {
+		self.storedImages = storedImages
 	}
 
-	var allStored: [UUID: StoredImage] { stored }
-
-	func stored(for id: UUID) -> StoredImage? { stored[id] }
+	func stored(for id: UUID) -> StoredImage? { storedImages[id] }
 
 	/// Imports bytes under the document's quality setting and returns the new ID.
 	@discardableResult
 	func add(_ data: Data, quality: ImageQuality) throws -> UUID {
 		let prepared = try ImageCoder.prepared(data, quality: quality)
 		let id = UUID()
-		stored[id] = StoredImage(data: prepared.data,
-								 contentType: prepared.contentType,
-								 pixelWidth: prepared.pixelWidth,
-								 pixelHeight: prepared.pixelHeight)
+		storedImages[id] = StoredImage(data: prepared.data,
+									   contentType: prepared.contentType,
+									   pixelWidth: prepared.pixelWidth,
+									   pixelHeight: prepared.pixelHeight)
 		return id
 	}
 
 	/// Inserts an image whose ID is already known, used when reading a document.
 	func insert(_ image: StoredImage, for id: UUID) {
-		stored[id] = image
+		storedImages[id] = image
 		decoded[id] = nil
 	}
 
 	func remove(_ id: UUID) {
-		stored[id] = nil
+		storedImages[id] = nil
 		decoded[id] = nil
 	}
 
 	/// The decoded image, decoded at most once per ID per session.
 	func image(for id: UUID) -> Image? {
 		if let cached = decoded[id] { return cached }
-		guard let stored = stored[id] else { return nil }
+		guard let stored = storedImages[id] else { return nil }
 
 		decodeCountForTesting += 1
 		#if os(macOS)
@@ -873,14 +871,14 @@ final class ImageStore {
 	/// Filename inside the package's `images/` directory, carrying the
 	/// image's own extension.
 	func filename(for id: UUID) -> String? {
-		guard let stored = stored[id] else { return nil }
+		guard let stored = storedImages[id] else { return nil }
 		let ext = stored.contentType.preferredFilenameExtension ?? "dat"
 		return "\(id.uuidString).\(ext)"
 	}
 
 	func metadata(for ids: Set<UUID>) -> [StoredImageMeta] {
 		ids.compactMap { id in
-			guard let stored = stored[id] else { return nil }
+			guard let stored = storedImages[id] else { return nil }
 			return StoredImageMeta(id: id,
 								   contentType: stored.contentType.identifier,
 								   pixelWidth: stored.pixelWidth,
@@ -927,7 +925,7 @@ put a full image decode in the render loop."
 - Produces:
   - `UTType.mozaicBoard`, `UTType.mozaicImageReference`
   - `@MainActor final class MozaicDocument: ReferenceFileDocument`
-  - `MozaicDocument.model: ProjectModel` (wired in Task 6; until then the document holds `board` and `images` directly)
+  - `MozaicDocument.model: ProjectModel` (wired in **Task 8**; until then the document holds `board` and `images` directly)
   - `struct BoardSnapshot: Sendable { var board: Board; var images: [UUID: StoredImage] }`
   - `static func makeFileWrapper(snapshot:existing:) throws -> FileWrapper` — static so it is testable without a document instance
   - `static func read(_ wrapper: FileWrapper) throws -> BoardSnapshot`
@@ -1144,11 +1142,11 @@ final class MozaicDocument: ReferenceFileDocument {
 	init(configuration: ReadConfiguration) throws {
 		let snapshot = try Self.read(configuration.file)
 		self.board = snapshot.board
-		self.images = ImageStore(stored: snapshot.images)
+		self.images = ImageStore(storedImages: snapshot.images)
 	}
 
 	func snapshot(contentType: UTType) throws -> BoardSnapshot {
-		BoardSnapshot(board: board, images: images.allStored)
+		BoardSnapshot(board: board, images: images.storedImages)
 	}
 
 	nonisolated func fileWrapper(snapshot: BoardSnapshot,
@@ -1329,9 +1327,11 @@ The deepest change in the plan. `ProjectModel` stops holding `Image` values and 
 - Modify: `Mozaic/Moodboard/ModWrapper.swift`
 - Modify: `Mozaic/Moodboard/MoodBoardMain.swift`
 - Modify: `Mozaic/inspector/bottomBar.swift`
-- Modify: `Mozaic/inspector/BoardSettings.swift`
 - Modify: `Mozaic/ContentView.swift`
 - Create: `MozaicTests/ProjectModelTests.swift`
+- (`Mozaic/inspector/BoardSettings.swift` needs no change: its `@Bindable`
+  bindings still resolve against `ProjectModel`'s new computed properties.
+  Touch it only if the build says otherwise.)
 
 **Interfaces:**
 - Consumes: `Board`, `Row`, `ImageStore`, `ImageQuality`.
@@ -1794,13 +1794,13 @@ import UniformTypeIdentifiers
 	@Test func acceptingAReferencePlacesWithoutCopyingBytes() throws {
 		let model = ProjectModel()
 		let id = try model.importImage(try pngData())
-		let storedCount = model.images.allStored.count
+		let storedCount = model.images.storedImages.count
 
 		try model.accept(.reference(id), row: 1, slot: 2)
 
 		#expect(model.board.rows[1].slots[2] == id)
 		// An in-app drag moves an ID: no new image is created.
-		#expect(model.images.allStored.count == storedCount)
+		#expect(model.images.storedImages.count == storedCount)
 	}
 
 	@Test func acceptingAnExternalDropImportsThenPlaces() throws {
@@ -1809,6 +1809,15 @@ import UniformTypeIdentifiers
 
 		let placed = try #require(model.board.rows[0].slots[3])
 		#expect(model.images.stored(for: placed) != nil)
+	}
+
+	@Test func acceptingAReferenceToAnUnknownImageIsIgnored() throws {
+		let model = ProjectModel()
+		try model.accept(.reference(UUID()), row: 0, slot: 0)
+
+		// A dangling reference must never reach the board, or the manifest
+		// would point at a file that was never written.
+		#expect(model.board.rows[0].slots[0] == nil)
 	}
 
 	@Test func acceptingCorruptExternalDataThrowsAndLeavesTheBoardAlone() {
@@ -1862,6 +1871,9 @@ extension ProjectModel {
 	func accept(_ dropped: DroppedImage, row: Int, slot: Int) throws {
 		switch dropped {
 		case .reference(let id):
+			// Defence in depth: never write an ID the store does not know
+			// about, whatever the payload claims.
+			guard images.stored(for: id) != nil else { return }
 			place(id, row: row, slot: slot)
 		case .external(let data, _):
 			let id = try importImage(data)
@@ -1873,28 +1885,52 @@ extension ProjectModel {
 
 - [ ] **Step 4: Restore drag and drop in the views**
 
-In `MbImage.swift`, add back to the `body` chain, after `.background(Material.thin)`:
+In `MbImage.swift`, attach the drag **inside** the branch that already knows an
+image exists, so an empty slot is simply not draggable. A slot must never
+originate a payload referencing an image that is not in the store: `place()`
+would write that dangling ID into the board and the manifest would then point
+at a file that was never written.
 
 ```swift
-.dropDestination(for: DroppedImage.self) { items, _ in
-	guard let first = items.first else { return false }
-	do {
-		try pm.accept(first, row: indexes[0], slot: indexes[1])
-		return true
-	} catch {
-		print("Drop rejected:", error)
-		return false
+	var body: some View {
+		Group {
+			if let imageID, let image = pm.image(for: imageID) {
+				image
+					.resizable()
+					.aspectRatio(contentMode: .fill)
+					.draggable(DroppedImage.reference(imageID)) {
+						image
+							.resizable()
+							.aspectRatio(contentMode: .fill)
+							.frame(width: imgWidth / 2, height: imgHeight / 2)
+							.clipShape(.rect(cornerRadius: pm.cellRadius))
+					}
+			} else {
+				Image("OGbgImg")
+					.resizable()
+					.aspectRatio(contentMode: .fill)
+			}
+		}
+		.frame(width: imgWidth, height: imgHeight)
+		.background(Material.thin)
+		.dropDestination(for: DroppedImage.self) { items, _ in
+			guard let first = items.first else { return false }
+			do {
+				try pm.accept(first, row: indexes[0], slot: indexes[1])
+				return true
+			} catch {
+				print("Drop rejected:", error)
+				return false
+			}
+		} isTargeted: { isTarget = $0 }
+		.contentShape(.rect(cornerRadius: pm.cellRadius).inset(by: 20))
+		.overlay {
+			RoundedRectangle(cornerRadius: pm.cellRadius)
+				.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)
+				.frame(width: imgWidth, height: imgHeight)
+		}
+		.clipShape(.rect(cornerRadius: pm.cellRadius))
 	}
-} isTargeted: { isTarget = $0 }
-.draggable(imageID.map { DroppedImage.reference($0) } ?? .reference(UUID())) {
-	if let image = pm.image(for: imageID) {
-		image
-			.resizable()
-			.aspectRatio(contentMode: .fill)
-			.frame(width: imgWidth / 2, height: imgHeight / 2)
-			.clipShape(.rect(cornerRadius: pm.cellRadius))
-	}
-}
 ```
 
 In `bottomBar.swift`, make tray thumbnails draggable by reference:
@@ -1958,11 +1994,11 @@ external drops carry bytes plus their content type so format survives."
 	init(configuration: ReadConfiguration) throws {
 		let snapshot = try Self.read(configuration.file)
 		self.model = ProjectModel(board: snapshot.board,
-								  images: ImageStore(stored: snapshot.images))
+								  images: ImageStore(storedImages: snapshot.images))
 	}
 
 	func snapshot(contentType: UTType) throws -> BoardSnapshot {
-		BoardSnapshot(board: model.board, images: model.images.allStored)
+		BoardSnapshot(board: model.board, images: model.images.storedImages)
 	}
 ```
 
@@ -2287,7 +2323,7 @@ Append to `ImageStore`:
 ```swift
 	/// Bytes currently held, for showing document size in the inspector.
 	var totalByteCount: Int {
-		stored.values.reduce(0) { $0 + $1.data.count }
+		storedImages.values.reduce(0) { $0 + $1.data.count }
 	}
 
 	/// Re-encodes every stored image down to the Standard cap, each to its own
@@ -2299,13 +2335,13 @@ Append to `ImageStore`:
 	@discardableResult
 	func reduceFileSize() throws -> Int {
 		let before = totalByteCount
-		for (id, image) in stored {
+		for (id, image) in storedImages {
 			let prepared = try ImageCoder.prepared(image.data, quality: .standard)
 			guard prepared.data.count < image.data.count else { continue }
-			stored[id] = StoredImage(data: prepared.data,
-									 contentType: prepared.contentType,
-									 pixelWidth: prepared.pixelWidth,
-									 pixelHeight: prepared.pixelHeight)
+			storedImages[id] = StoredImage(data: prepared.data,
+										   contentType: prepared.contentType,
+										   pixelWidth: prepared.pixelWidth,
+										   pixelHeight: prepared.pixelHeight)
 			decoded[id] = nil          // force a re-decode of the new bytes
 		}
 		return before - totalByteCount
