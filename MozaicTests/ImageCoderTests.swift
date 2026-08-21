@@ -24,6 +24,28 @@ import UniformTypeIdentifiers
 		return out as Data
 	}
 
+	/// Builds a real encoded image with more than one frame, so tests can
+	/// exercise the multi-frame exemption without an animated-GIF fixture.
+	/// TIFF supports multiple pages and is otherwise round-trippable, which
+	/// is exactly the case FIX 2 has to catch.
+	private func makeMultiFrameImage(width: Int, height: Int, frameCount: Int, type: UTType) throws -> Data {
+		let cs = CGColorSpaceCreateDeviceRGB()
+		let ctx = CGContext(data: nil, width: width, height: height,
+							bitsPerComponent: 8, bytesPerRow: 0, space: cs,
+							bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+		ctx.setFillColor(CGColor(red: 0.2, green: 0.5, blue: 0.9, alpha: 1))
+		ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+		let frame = ctx.makeImage()!
+
+		let out = NSMutableData()
+		let dest = CGImageDestinationCreateWithData(out, type.identifier as CFString, frameCount, nil)!
+		for _ in 0..<frameCount {
+			CGImageDestinationAddImage(dest, frame, nil)
+		}
+		#expect(CGImageDestinationFinalize(dest))
+		return out as Data
+	}
+
 	@Test func sniffsContentTypeFromBytesNotExtension() throws {
 		let png = try makeImage(width: 10, height: 10, type: .png)
 		let jpeg = try makeImage(width: 10, height: 10, type: .jpeg)
@@ -83,6 +105,29 @@ import UniformTypeIdentifiers
 		#expect(ImageCoder.isRoundTrippable(.gif) == false)
 		#expect(ImageCoder.isRoundTrippable(.png))
 		#expect(ImageCoder.isRoundTrippable(.jpeg))
+	}
+
+	@Test func oversizedGifPassesThroughVerbatimAndExemptFromCap() throws {
+		let gif = try makeImage(width: 1200, height: 800, type: .gif)
+		let result = try ImageCoder.prepared(gif, quality: .standard)
+
+		// Byte-identical, still a GIF, and still over the cap: GIF is
+		// exempt from downscaling entirely, not merely resized poorly.
+		#expect(result.data == gif)
+		#expect(result.contentType == .gif)
+		#expect(result.pixelWidth > ImageQuality.standardMaxPixel)
+	}
+
+	@Test func oversizedMultiFrameImagePassesThroughVerbatimAndExemptFromCap() throws {
+		let tiff = try makeMultiFrameImage(width: 1200, height: 800, frameCount: 2, type: .tiff)
+		let result = try ImageCoder.prepared(tiff, quality: .standard)
+
+		// TIFF is otherwise round-trippable, but a multi-page source can't
+		// be re-encoded faithfully with a single-frame thumbnail pass, so it
+		// must pass through untouched exactly like GIF does.
+		#expect(result.data == tiff)
+		#expect(result.contentType == .tiff)
+		#expect(result.pixelWidth > ImageQuality.standardMaxPixel)
 	}
 
 	@Test func unrecognizedFormatThrows() {

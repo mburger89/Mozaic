@@ -25,17 +25,21 @@ struct PreparedImage: Sendable {
 /// content type.
 enum ImageCoder {
 	/// Lossy-compression quality used when a downscale forces a re-encode.
-	static let recompressionQuality = 0.85
+	nonisolated static let recompressionQuality = 0.85
 
 	/// Identifies format from the bytes themselves. A file whose extension
 	/// disagrees with its contents must not be believed.
-	static func contentType(of data: Data) -> UTType? {
+	///
+	/// `nonisolated`: pure function over `Data` with no shared state, so
+	/// callers (including the image-import path) can run it off the main
+	/// actor instead of blocking the UI while decoding.
+	nonisolated static func contentType(of data: Data) -> UTType? {
 		guard let source = CGImageSourceCreateWithData(data as CFData, nil),
 			  let identifier = CGImageSourceGetType(source) as String? else { return nil }
 		return UTType(identifier)
 	}
 
-	static func pixelSize(of data: Data) -> CGSize? {
+	nonisolated static func pixelSize(of data: Data) -> CGSize? {
 		guard let source = CGImageSourceCreateWithData(data as CFData, nil),
 			  let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
 			  let width = properties[kCGImagePropertyPixelWidth] as? Int,
@@ -45,7 +49,7 @@ enum ImageCoder {
 
 	/// Whether this platform can write the given type, so a downscale can
 	/// round-trip back into it.
-	static func isRoundTrippable(_ type: UTType) -> Bool {
+	nonisolated static func isRoundTrippable(_ type: UTType) -> Bool {
 		guard let writable = CGImageDestinationCopyTypeIdentifiers() as? [String] else { return false }
 		// GIF is nominally writable but has no sensible single-frame
 		// re-encode, so it is excluded deliberately.
@@ -56,9 +60,15 @@ enum ImageCoder {
 	/// Prepares imported bytes for storage under the document's quality setting.
 	///
 	/// Returns the original bytes untouched whenever no resize is needed —
-	/// in `.full` mode, when the image is already within the cap, or when the
-	/// format cannot be round-tripped.
-	static func prepared(_ data: Data, quality: ImageQuality) throws -> PreparedImage {
+	/// in `.full` mode, when the image is already within the cap, when the
+	/// format cannot be round-tripped, or when the source has more than one
+	/// frame (see below).
+	///
+	/// `nonisolated`: this decodes, downscales and re-encodes — potentially
+	/// expensive work over a multi-megapixel photo — so it must be callable
+	/// from a background task rather than running synchronously on the main
+	/// actor during import.
+	nonisolated static func prepared(_ data: Data, quality: ImageQuality) throws -> PreparedImage {
 		guard let type = contentType(of: data), let size = pixelSize(of: data) else {
 			throw ImageCoderError.unrecognizedFormat
 		}
@@ -78,6 +88,14 @@ enum ImageCoder {
 		guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
 			throw ImageCoderError.decodeFailed
 		}
+
+		// A source with more than one frame (an animated format, or a
+		// multi-page TIFF) cannot be re-encoded faithfully: downscaling
+		// below only ever reads and writes frame 0, which would silently
+		// drop every other frame. If we cannot re-encode it faithfully, we
+		// do not re-encode it at all — same rule as the GIF exclusion above.
+		guard CGImageSourceGetCount(source) <= 1 else { return verbatim }
+
 		let options: [CFString: Any] = [
 			kCGImageSourceCreateThumbnailFromImageAlways: true,
 			kCGImageSourceCreateThumbnailWithTransform: true,

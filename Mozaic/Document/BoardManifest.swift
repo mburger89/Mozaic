@@ -14,7 +14,10 @@ enum ImageQuality: String, Codable, CaseIterable, Sendable {
 	/// The largest module renders a 310pt slot, so this covers a 3x export
 	/// of even the biggest cell with headroom. Any image can be dragged into
 	/// any slot, so this targets the largest slot, not the one it landed in.
-	static let standardMaxPixel = 1000
+	///
+	/// `nonisolated`: read by `ImageCoder`, which must itself be nonisolated
+	/// so image encoding can run off the main actor.
+	nonisolated static let standardMaxPixel = 1000
 }
 
 /// What the manifest records about one stored image. The bytes live in the
