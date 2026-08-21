@@ -4,7 +4,7 @@ import Foundation
 ///
 /// This governs import only. Changing it does not alter images already
 /// stored — see the Reduce File Size command.
-enum ImageQuality: String, Codable, CaseIterable, Sendable {
+nonisolated enum ImageQuality: String, Codable, CaseIterable, Sendable {
 	/// Downscale to `standardMaxPixel` on the longest edge, re-encoding to
 	/// the image's own format.
 	case standard
@@ -22,7 +22,7 @@ enum ImageQuality: String, Codable, CaseIterable, Sendable {
 
 /// What the manifest records about one stored image. The bytes live in the
 /// package's `images/` directory, not here.
-struct StoredImageMeta: Codable, Hashable, Sendable {
+nonisolated struct StoredImageMeta: Codable, Hashable, Sendable {
 	var id: UUID
 	/// UTI string, e.g. `public.jpeg`. Sniffed from the bytes, never from a
 	/// filename extension.
@@ -34,7 +34,7 @@ struct StoredImageMeta: Codable, Hashable, Sendable {
 /// One row of the board: a layout plus four slots referencing images by ID.
 ///
 /// Layouts using fewer than four images ignore the trailing slots.
-struct Row: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct Row: Codable, Hashable, Identifiable, Sendable {
 	var id: UUID
 	var module: Module
 	/// Always four entries. `nil` is an empty slot.
@@ -46,7 +46,7 @@ struct Row: Codable, Hashable, Identifiable, Sendable {
 }
 
 /// Everything about a board except the image bytes.
-struct Board: Codable, Hashable, Sendable {
+nonisolated struct Board: Codable, Hashable, Sendable {
 	var projectName: String = "Untitled Project"
 	var createdBy: String = "Anonymous"
 	var projectDescription: String = ""
@@ -71,7 +71,7 @@ struct Board: Codable, Hashable, Sendable {
 }
 
 /// The root object encoded to `manifest.json`.
-struct BoardFile: Codable, Sendable {
+nonisolated struct BoardFile: Codable, Sendable {
 	static let currentFormatVersion = 1
 
 	var formatVersion: Int
