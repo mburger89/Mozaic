@@ -19,6 +19,8 @@
 		73E9A6CE2E8E45E50083CF99 /* Mozaic_temp.icon in Resources */ = {isa = PBXBuildFile; fileRef = 73E9A6CD2E8E45E50083CF99 /* Mozaic_temp.icon */; };
 		73E9A6D32E9075B20083CF99 /* Bottominfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D22E9075B20083CF99 /* Bottominfo.swift */; };
 		73E9A6D62E9076BB0083CF99 /* ModWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */; };
+		8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35860FD3503293935E5EF01 /* BoardManifest.swift */; };
+		BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */; };
 		C42603667FCBE9E1CACF4026 /* MozaicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1026FFECF9D0447E26238E /* MozaicUITests.swift */; };
 		D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */; };
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
@@ -44,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifestTests.swift; path = MozaicTests/BoardManifestTests.swift; sourceTree = "<group>"; };
 		668A003C8F24B216C56DD155 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmokeTests.swift; path = MozaicTests/SmokeTests.swift; sourceTree = "<group>"; };
 		73383CB22CFA9197007150D7 /* ProjectModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectModel.swift; sourceTree = "<group>"; };
 		73383CB42CFA9197007150D7 /* MbImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MbImage.swift; sourceTree = "<group>"; };
@@ -55,6 +58,7 @@
 		73E9A6CD2E8E45E50083CF99 /* Mozaic_temp.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Mozaic_temp.icon; sourceTree = "<group>"; };
 		73E9A6D22E9075B20083CF99 /* Bottominfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bottominfo.swift; sourceTree = "<group>"; };
 		73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModWrapper.swift; sourceTree = "<group>"; };
+		C35860FD3503293935E5EF01 /* BoardManifest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifest.swift; path = Document/BoardManifest.swift; sourceTree = "<group>"; };
 		C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITestsLaunchTests.swift; path = MozaicUITests/MozaicUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		D86BB69D2BF67EF00054AC82 /* Mozaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mozaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MozaicApp.swift; sourceTree = "<group>"; };
@@ -96,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				668A003C8F24B216C56DD155 /* SmokeTests.swift */,
+				54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -139,6 +144,14 @@
 			path = inspector;
 			sourceTree = "<group>";
 		};
+		9F567172A6A7A433FAA46CA4 /* Document */ = {
+			isa = PBXGroup;
+			children = (
+				C35860FD3503293935E5EF01 /* BoardManifest.swift */,
+			);
+			name = Document;
+			sourceTree = "<group>";
+		};
 		D86BB6942BF67EF00054AC82 = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +184,7 @@
 				73E9A6CD2E8E45E50083CF99 /* Mozaic_temp.icon */,
 				D86BB6A82BF67EF10054AC82 /* Mozaic.entitlements */,
 				D86BB6A92BF67EF10054AC82 /* Preview Content */,
+				9F567172A6A7A433FAA46CA4 /* Document */,
 			);
 			path = Mozaic;
 			sourceTree = "<group>";
@@ -325,6 +339,7 @@
 				73383CC62CFA9197007150D7 /* MbImage.swift in Sources */,
 				D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */,
 				D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */,
+				8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,6 +348,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				523BFFF17FB002588602C004 /* SmokeTests.swift in Sources */,
+				BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

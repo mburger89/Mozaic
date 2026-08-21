@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// The raw values are the strings persisted in `MDataModel.module1...module6`,
 /// so they must not change without migrating stored boards.
-enum Module: String, CaseIterable, Identifiable {
+enum Module: String, CaseIterable, Identifiable, Codable {
 	case vlong2short = "vlong2short"
 	case twoshorthlong = "twoshorthlong"
 	case twoshortvlong = "twoshortvlong"
