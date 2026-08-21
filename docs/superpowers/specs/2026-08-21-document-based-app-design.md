@@ -19,7 +19,7 @@ scope.
 |---|---|
 | Sharing model | File handoff. Recipient edits their own copy. |
 | Document format | Package (`FileWrapper` directory) |
-| Image encoding | PNG, always |
+| Image encoding | Original format preserved; re-encoded to that same format only when downscaling |
 | Standard quality cap | 1000px longest edge |
 | Full quality | Opt-in, per document |
 | Unplaced image tray | Saved with the document, capped at 30 |
@@ -36,9 +36,19 @@ isn't lost:
   which moved that weakness into the common case. Meanwhile the flat file's
   advantage (surviving Slack and Gmail uploads) stopped mattering, because
   boards that large can't use those transports anyway.
-- **Encoding.** A mixed JPEG/PNG rule was proposed to keep photos small. The
-  all-PNG requirement supersedes it and removes the `isOpaque` field that
-  existed only to choose between encoders.
+
+  Preserving original formats later brought Standard-mode boards back down to
+  10–20 MB, which weakens that specific argument — but the package decision
+  stands. Full mode is still 70–150 MB, where incremental save matters most,
+  and a package costs nothing at 20 MB. Reversing it again would be churn, not
+  improvement.
+- **Encoding**, twice. A mixed JPEG/PNG rule was proposed first, to keep
+  photos small. It was replaced by an all-PNG rule, which removed the
+  `isOpaque` field that existed only to choose between encoders — but all-PNG
+  turned out to inflate Full mode badly, since a 3 MB JPEG re-encoded to PNG
+  becomes 25–35 MB. Preserving each image's original format supersedes both:
+  it removes the inflation entirely, and as a side effect brings Standard-mode
+  boards down to roughly 10–20 MB, which is emailable again.
 
 ## Format
 
@@ -46,7 +56,9 @@ isn't lost:
 MyBoard.mozaic/            package; one file to Finder, AirDrop, iCloud Drive
   manifest.json
   images/
+    <uuid>.jpg             extension follows each image's own format
     <uuid>.png
+    <uuid>.heic
 ```
 
 `manifest.json` carries no image bytes, so it stays small and inspectable:
@@ -69,15 +81,16 @@ MyBoard.mozaic/            package; one file to Finder, AirDrop, iCloud Drive
     "tray": ["<uuid>"]
   },
   "images": [
-    { "id": "<uuid>", "pixelWidth": 1000, "pixelHeight": 750 }
+    { "id": "<uuid>", "contentType": "public.jpeg",
+      "pixelWidth": 1000, "pixelHeight": 750 }
   ]
 }
 ```
 
 Rows and tray hold **IDs, not bytes**. An image that is both placed and in the
 tray is stored once — this is what makes saving the tray affordable instead of
-doubling the file. Image dimensions live in the manifest so layout decisions
-never require decoding a PNG.
+doubling the file. Image dimensions and content type live in the manifest, so layout and
+re-encoding decisions never require decoding the image.
 
 `Module` already has stable `String` raw values, so it encodes directly. Those
 raw values are now a persistence contract and must not change.
@@ -175,14 +188,16 @@ Replace it with a `Transferable` that handles both origins:
 
 ```swift
 enum DroppedImage: Transferable {
-    case reference(UUID)   // dragged within the app
-    case external(Data)    // dragged in from Photos, Finder, another app
+    case reference(UUID)              // dragged within the app
+    case external(Data, UTType)       // from Photos, Finder, another app
 
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .mozaicImageReference)
-        DataRepresentation(importedContentType: .png)  { .external($0) }
-        DataRepresentation(importedContentType: .jpeg) { .external($0) }
-        DataRepresentation(importedContentType: .heic) { .external($0) }
+        DataRepresentation(importedContentType: .png)  { .external($0, .png)  }
+        DataRepresentation(importedContentType: .jpeg) { .external($0, .jpeg) }
+        DataRepresentation(importedContentType: .heic) { .external($0, .heic) }
+        DataRepresentation(importedContentType: .tiff) { .external($0, .tiff) }
+        DataRepresentation(importedContentType: .gif)  { .external($0, .gif)  }
     }
 }
 ```
@@ -195,17 +210,39 @@ pipeline below.
 
 ## Image pipeline
 
+**Images keep the format they arrived in.** Mozaic never converts between
+formats; a JPEG stays a JPEG, a PNG stays a PNG. Re-encoding happens only as a
+side effect of downscaling, and always back to the source's own format.
+
 Import, from any source (`fileImporter`, `PhotosPicker`, external drop):
 
-1. Decode to a platform image.
-2. If `quality == .standard` and the longest edge exceeds 1000px, scale down
-   to 1000px preserving aspect ratio.
-3. Encode to PNG.
-4. Store under a fresh UUID, record pixel dimensions in the manifest.
+1. Identify the content type. Reject anything that isn't an image.
+2. If `quality == .full`, **store the original bytes verbatim** — no decode, no
+   re-encode, nothing to lose.
+3. If `quality == .standard` and the longest edge exceeds 1000px, decode,
+   scale to 1000px preserving aspect ratio, and re-encode to the *same*
+   content type (JPEG at 0.85, PNG lossless, HEIC at 0.85).
+4. If `quality == .standard` and the image is already within the cap, store
+   the original bytes verbatim. Never re-encode an image that doesn't need
+   resizing — that would lose quality for nothing.
+5. Store under a fresh UUID; record content type and pixel dimensions in the
+   manifest.
+
+Round-tripping is supported for PNG, JPEG, HEIC, and TIFF. **Any other format
+— GIF being the realistic case, since `fileImporter` accepts it — is stored
+verbatim and never downscaled**, because re-encoding it would either change
+its format or destroy it (an animated GIF has no sensible single-frame
+re-encode). Such images are exempt from the cap, and the size cost is
+accepted.
 
 The largest module renders a 310pt slot, so 1000px covers a 3× export of even
 the biggest cell with headroom. Because any image can be dragged into any
 slot, sizing targets the largest slot rather than the slot it first landed in.
+
+Format preservation makes Standard mode substantially cheaper than the earlier
+all-PNG rule: a 1000px photo is ~200–400 KB as JPEG rather than ~2 MB as PNG,
+putting a full board near 10–20 MB. Full mode stores originals, so a board of
+12-megapixel photos runs 70–150 MB — large, but honest, with no inflation.
 
 ### Tray cap
 
@@ -216,7 +253,9 @@ user is told when it happens.
 ### Reduce File Size
 
 An explicit command that re-encodes every stored image down to the Standard
-cap and reports bytes saved.
+cap and reports bytes saved. Each image is re-encoded to its own format, and
+images already within the cap — or in a format that isn't round-trippable —
+are left untouched.
 
 This is **destructive and not undoable** — the discarded detail is gone, so
 registering it with the `UndoManager` would be a lie. It requires
@@ -296,7 +335,8 @@ New:
 - `Mozaic/Document/BoardManifest.swift` — `BoardFile`, `Board`, `Row`,
   `StoredImageMeta`, `ImageQuality`
 - `Mozaic/Document/ImageStore.swift`
-- `Mozaic/Document/ImageCoder.swift` — downscale + PNG encode, per platform
+- `Mozaic/Document/ImageCoder.swift` — content-type sniffing, downscale, and
+  same-format re-encode, per platform
 - `Mozaic/Document/UTType+Mozaic.swift`
 - `Mozaic/Moodboard/DroppedImage.swift`
 
@@ -318,6 +358,8 @@ file compiles nowhere and nothing references it.
 | Manifest references an image file that is absent | Render a placeholder in that slot; open the document anyway |
 | Image file present but undecodable | Same as absent |
 | Import of an unsupported or corrupt image | Reject that image, report it, leave the board untouched |
+| Image whose bytes disagree with its extension | Trust the bytes; record the sniffed type |
+| Round-trippable format fails to re-encode | Fall back to storing the original bytes rather than losing the image |
 
 Partial-data tolerance on open is deliberate. A board that lost one image
 should still open with the other 23.
@@ -334,6 +376,11 @@ it can be covered:
 - tray eviction at the cap, and that eviction never removes a placed image
 - downscale arithmetic: aspect ratio preserved, no upscaling of small images,
   the 1000px boundary itself
+- format preservation: a JPEG in is a JPEG out, a PNG in is a PNG out; an
+  image already under the cap comes back byte-identical rather than re-encoded;
+  Full mode returns the original bytes untouched; a GIF is stored verbatim and
+  exempt from the cap
+- content type is identified from the bytes, not the filename extension
 - `Module` raw values, pinned as a persistence contract
 
 ### Step zero: the test targets are empty
@@ -378,24 +425,19 @@ every image on every save and forfeits the reason for choosing a package;
 over-eager reuse writes stale images. Needs a test that saves, mutates one
 image, saves again, and asserts what changed on disk.
 
-**Full-quality mode and PNG.** Flagged for a decision before implementation.
-"All images as PNG" combined with `quality == .full` means a JPEG import is
-re-encoded to PNG, which *inflates* it — a 3 MB 12-megapixel iPhone JPEG
-becomes roughly 25–35 MB as PNG. A full board in Full mode could exceed
-500 MB, which is not a usable document. Options:
+**Full mode is unbounded.** Storing originals verbatim means a board's size is
+whatever the user imports. Twenty-four 12-megapixel photos is 70–150 MB; a
+board built from 48-megapixel ProRAW-derived exports would be far larger.
+There is no inflation any more — the file is exactly as big as its inputs —
+but there is also no ceiling. Mitigation is to surface the document's size in
+the settings inspector next to the quality toggle, so the cost is visible at
+the moment the user opts in, rather than discovered when sharing fails.
 
-1. Keep it strictly all-PNG and treat Full mode as archival, documenting the
-   size.
-2. Let Full mode store original bytes when the source is already PNG, and
-   re-encode otherwise (partial mitigation only).
-3. Allow original-format passthrough in Full mode, breaking the all-PNG rule
-   for that mode alone.
-4. Cap Full mode at some larger bound, e.g. 4000px, so it is "high" rather
-   than "unbounded".
-
-Recommendation: option 4. It keeps every stored image a PNG, keeps Full mode
-meaningfully higher fidelity than Standard, and bounds the worst case at
-roughly 60–80 MB per board instead of 500 MB+.
+**Format sniffing.** Preserving format means trusting the declared content
+type. A file whose extension disagrees with its actual bytes (a PNG named
+`.jpg`) must be identified by content, not name, or the manifest will record a
+lie and later re-encoding will fail. Identify from the data itself and treat
+the extension as a hint only.
 
 ## Out of scope
 
