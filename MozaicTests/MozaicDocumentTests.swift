@@ -109,12 +109,21 @@ import UniformTypeIdentifiers
 			"manifest.json": FileWrapper(regularFileWithContents: try JSONEncoder().encode(file)),
 			"images": FileWrapper(directoryWithFileWrappers: [:]),
 		])
-		#expect(throws: DocumentError.self) { try MozaicDocument.read(poisoned) }
+		// The exact case, not just any DocumentError: a newer format version has
+		// to be distinguishable so the app can say why it cannot open the file.
+		#expect(throws: DocumentError.unsupportedVersion(BoardFile.currentFormatVersion + 1)) {
+			try MozaicDocument.read(poisoned)
+		}
 	}
 
 	@Test func missingManifestThrows() {
 		let empty = FileWrapper(directoryWithFileWrappers: [:])
-		#expect(throws: DocumentError.self) { try MozaicDocument.read(empty) }
+		#expect(throws: DocumentError.missingManifest) { try MozaicDocument.read(empty) }
+	}
+
+	@Test func aRegularFileIsNotAPackage() {
+		let notADirectory = FileWrapper(regularFileWithContents: Data("not a package".utf8))
+		#expect(throws: DocumentError.notAPackage) { try MozaicDocument.read(notADirectory) }
 	}
 
 	@Test func aMissingImageFileDoesNotPreventOpening() throws {

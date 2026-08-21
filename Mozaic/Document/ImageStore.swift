@@ -36,8 +36,17 @@ final class ImageStore {
 	/// Test-only counter proving memoization holds.
 	@ObservationIgnored private(set) var decodeCountForTesting = 0
 
-	init(storedImages: [UUID: StoredImage] = [:]) {
-		self.storedImages = storedImages
+	/// `nonisolated`: `MozaicDocument.init(configuration:)` builds the store
+	/// while reading a package, and SwiftUI does not contract that read to
+	/// the main actor. Safe because this only places a `Sendable` dictionary
+	/// into the new instance's own storage -- it touches no main-actor state.
+	///
+	/// Assigns `@Observable`'s backing storage rather than `self.storedImages`
+	/// because the macro turns the latter into a main-actor-isolated accessor,
+	/// which a nonisolated initializer cannot call. This is what that
+	/// accessor's `init` does anyway, and initialization publishes no change.
+	nonisolated init(storedImages: [UUID: StoredImage] = [:]) {
+		_storedImages = storedImages
 	}
 
 	func stored(for id: UUID) -> StoredImage? { storedImages[id] }

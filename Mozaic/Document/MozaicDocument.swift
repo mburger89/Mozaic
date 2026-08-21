@@ -44,7 +44,14 @@ final class MozaicDocument: @preconcurrency ReferenceFileDocument {
 		self.images = ImageStore()
 	}
 
-	init(configuration: ReadConfiguration) throws {
+	/// `nonisolated`: SwiftUI's iOS document path is `UIDocument`-backed and
+	/// loads content off the main queue, and nothing in the SDK contracts
+	/// this initializer to the main actor. Leaving it isolated would put a
+	/// dynamic isolation check -- a crash on opening a file -- in the read
+	/// path. Nothing here needs the main actor: `read` is nonisolated,
+	/// `Board` is a nonisolated value type, and `ImageStore`'s initializer is
+	/// nonisolated too.
+	nonisolated init(configuration: ReadConfiguration) throws {
 		let snapshot = try Self.read(configuration.file)
 		self.board = snapshot.board
 		self.images = ImageStore(storedImages: snapshot.images)
