@@ -59,24 +59,12 @@ struct ContentView: View {
 						) { result in
 							switch result {
 								case .success(let file):
-									let access = file.startAccessingSecurityScopedResource()
-									if access {
-										do {
-											let data = try Data(contentsOf: file)
-#if os(iOS)
-											if let uiImage = UIImage(data: data) {
-												pm.selectedPHImages.append(Image(uiImage: uiImage))
-											}
-#endif // os(iOS)
-#if os(macOS)
-											if let nsImage = NSImage(data: data) {
-												pm.selectedPHImages.append(Image(nsImage: nsImage))
-											}
-#endif // os(macOS)
-											file.stopAccessingSecurityScopedResource()
-										} catch {
-											print("Failed to load image data:\n", error)
-										}
+									guard file.startAccessingSecurityScopedResource() else { return }
+									defer { file.stopAccessingSecurityScopedResource() }
+									do {
+										try pm.importImage(try Data(contentsOf: file))
+									} catch {
+										print("Failed to import image:", error)
 									}
 								case .failure(let error):
 									print(error.localizedDescription)
@@ -90,9 +78,8 @@ struct ContentView: View {
 						.onChange(of: selectedItems) {
 							Task {
 								for item in selectedItems {
-									if let image = try? await item.loadTransferable(type: Image.self) {
-										pm.selectedPHImages.append(image)
-									}
+									guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
+									try? pm.importImage(data)
 								}
 							}
 						}
@@ -129,7 +116,7 @@ struct ContentView: View {
 		.inspector(isPresented: $showSettings) {
 			TabView {
 				Tab("Images", systemImage: "photo") {
-					BottomBar(images: pm.selectedPHImages)
+					BottomBar(pm: pm, imageIDs: pm.board.tray)
 				}
 				Tab("Controls", systemImage: "gear") {
 					BoardSettings(pm: pm)

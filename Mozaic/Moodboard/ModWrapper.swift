@@ -66,7 +66,7 @@ struct ModuleWrapper: View {
 
 	var body: some View {
 		VStack {
-			switch pm.imgC[mbCell.index].module {
+			switch pm.board.rows[mbCell.index].module {
 				case .vlong2short:
 					Vlong2Short(pm: pm, mbCell: mbCell)
 				case .twoshorthlong:
@@ -98,7 +98,7 @@ struct ModuleWrapper: View {
 	}
 
 	private func setModule(_ module: Module) {
-		pm.imgC[mbCell.index].module = module
+		pm.setModule(module, row: mbCell.index)
 		isPickingModule = false
 	}
 }
@@ -155,13 +155,12 @@ struct ModuleButton: View {
 #Preview {
 	let cellWidth: CGFloat = 155
 	let twoCellWidth: CGFloat = 155 * 2
-	let image: Image = Image("OGbgImg")
 	ModuleWrapper(
 		mbCell: MbCell(
 			cellSpacing: 10,
 			cell: cellWidth,
 			twoCell: (twoCellWidth + 10) ,
-			img: [image,image,image,image],
+			slots: [nil, nil, nil, nil],
 			index: 0
 	)).environment(ProjectModel())
 }

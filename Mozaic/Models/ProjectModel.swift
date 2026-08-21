@@ -1,105 +1,97 @@
 import Foundation
 import SwiftUI
 
-/// One row of the moodboard: a layout plus the images filling its slots.
+/// The live, editable state of one board.
 ///
-/// Every row carries four images regardless of layout; layouts that use fewer
-/// slots simply ignore the trailing entries.
-struct MbRow: Identifiable {
-	let id: UUID = UUID()
-	var module: Module
-	var image: [Image]
-}
-
+/// Holds image *identifiers*, never decoded images: `ImageStore` owns the
+/// bytes and the decode cache.
 @MainActor
 @Observable
-class ProjectModel {
-	/// Base width of a single moodboard cell before the grid gap is applied.
+final class ProjectModel {
+	/// Base width of a single cell before the grid gap is applied.
 	///
-	/// The module and grid frames in `ModuleWrapper` and `MoodBoardMain` are
-	/// derived from this value; changing it alone will misalign the board.
+	/// The module and grid frames in `ModuleWrapper` and `MoodBoardMain` derive
+	/// from this; changing it alone will misalign the board.
 	static let baseCellWidth: CGFloat = 155.0
 
-	var projectID: UUID?
-	var projectDescription: String = "a description of the project"
-	var projectName: String = "Untitled Project"
-	var createdBy: String = "Anonymous"
-	var showBoardInfo: Bool = true
-	var isSideBarOpen = false
-	var gridGap: Double = 10.0
-	var cellRadius: Double = 10.0
-	var selectedPHImages: [Image] = []
+	var board: Board
+	let images: ImageStore
 
-//	MARK: Mood var
-	var imgC: [MbRow] = [
-		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-		MbRow(module: .vlong2short, image: [Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg"),Image("OGbgImg")]),
-	]
+	init(board: Board = Board(), images: ImageStore = ImageStore()) {
+		self.board = board
+		self.images = images
+	}
 
-// MARK: mood functions
+	// MARK: Board settings passthroughs
+
+	var projectName: String {
+		get { board.projectName }
+		set { board.projectName = newValue }
+	}
+	var createdBy: String {
+		get { board.createdBy }
+		set { board.createdBy = newValue }
+	}
+	var showBoardInfo: Bool {
+		get { board.showBoardInfo }
+		set { board.showBoardInfo = newValue }
+	}
+	var gridGap: Double {
+		get { board.gridGap }
+		set { board.gridGap = newValue }
+	}
+	var cellRadius: Double {
+		get { board.cellRadius }
+		set { board.cellRadius = newValue }
+	}
+	var quality: ImageQuality {
+		get { board.quality }
+		set { board.quality = newValue }
+	}
+
+	// MARK: Geometry
 
 	/// Width of a single cell, inset by half the grid gap so adjacent cells
 	/// keep a constant pitch as the gap changes.
-	var cellWidth: CGFloat {
-		Self.baseCellWidth - halfGridGap
+	var cellWidth: CGFloat { Self.baseCellWidth - halfGridGap }
+	var twoCellWidth: CGFloat { Self.baseCellWidth * 2.0 }
+	var halfGridGap: CGFloat { CGFloat(gridGap) / 2.0 }
+
+	// MARK: Editing
+
+	func image(for id: UUID?) -> Image? {
+		guard let id else { return nil }
+		return images.image(for: id)
 	}
 
-	/// Width of a cell spanning two columns.
-	var twoCellWidth: CGFloat {
-		Self.baseCellWidth * 2.0
+	func place(_ id: UUID, row: Int, slot: Int) {
+		guard board.rows.indices.contains(row),
+			  board.rows[row].slots.indices.contains(slot) else { return }
+		board.rows[row].slots[slot] = id
 	}
 
-	var halfGridGap: CGFloat {
-		CGFloat(gridGap) / 2.0
+	func clearSlot(row: Int, slot: Int) {
+		guard board.rows.indices.contains(row),
+			  board.rows[row].slots.indices.contains(slot) else { return }
+		board.rows[row].slots[slot] = nil
 	}
 
-	func writeToModel(items: [Image], indexs: [Int]) {
-		self.imgC[indexs[0]].image[indexs[1]] = items[0]
+	func setModule(_ module: Module, row: Int) {
+		guard board.rows.indices.contains(row) else { return }
+		board.rows[row].module = module
 	}
 
-	#if os(iOS)
-	func imageToData(img: Image) -> Data {
-		guard let data = ImageRenderer(content: img).uiImage?.pngData() else {
-			print("[Warning] Failed to convert UIImage to Data in imageToData")
-			return Data()
+	/// Imports bytes into the store and puts the image in the tray.
+	///
+	/// The tray cap bounds tray membership only — never the store — so
+	/// eviction can never remove an image that is placed on the board.
+	@discardableResult
+	func importImage(_ data: Data) throws -> UUID {
+		let id = try images.add(data, quality: board.quality)
+		board.tray.append(id)
+		if board.tray.count > Board.trayLimit {
+			board.tray.removeFirst(board.tray.count - Board.trayLimit)
 		}
-		return data
+		return id
 	}
-
-	func multipleImgToData(img: [Image]) -> [Data] {
-		img.map { imageToData(img: $0) }
-	}
-
-	func multipleImgtoImage(img: [Data]) -> [Image] {
-		img.compactMap { data in
-			guard let uiImage = UIImage(data: data) else {
-				print("[Warning] Failed to convert Data to UIImage in multipleImgtoImage")
-				return nil
-			}
-			return Image(uiImage: uiImage)
-		}
-	}
-
-	func dataToImage(img: Data) -> Image {
-		guard let uiImage = UIImage(data: img) else {
-			print("[Warning] Failed to convert Data to UIImage in dataToImage")
-			return Image(systemName: "photo")
-		}
-		return Image(uiImage: uiImage)
-	}
-	#endif // os(iOS)
-	#if os(macOS)
-	func imageToData(img: Image) async -> Data {
-		guard let nsImage = ImageRenderer(content: img).nsImage,
-			  let data = try? await nsImage.exported(as: .png) else {
-			print("[Warning] Failed to export NSImage to Data in imageToData")
-			return Data()
-		}
-		return data
-	}
-	#endif // os(macOS)
 }

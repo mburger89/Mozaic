@@ -32,6 +32,7 @@
 		D86BB6A72BF67EF10054AC82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6A62BF67EF10054AC82 /* Assets.xcassets */; };
 		D86BB6AB2BF67EF10054AC82 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6AA2BF67EF10054AC82 /* Preview Assets.xcassets */; };
 		DAA36D6AF24E988192102B80 /* UTType+Mozaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */; };
+		F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4631F8AE6697824315DF118 /* ProjectModelTests.swift */; };
 		FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6A6429C384F741DB44215D /* ImageCoderTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -74,6 +75,7 @@
 		9275C19F2D9AF47998246CB6 /* ImageCoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCoder.swift; path = Document/ImageCoder.swift; sourceTree = "<group>"; };
 		C35860FD3503293935E5EF01 /* BoardManifest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifest.swift; path = Document/BoardManifest.swift; sourceTree = "<group>"; };
 		C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITestsLaunchTests.swift; path = MozaicUITests/MozaicUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		D4631F8AE6697824315DF118 /* ProjectModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProjectModelTests.swift; path = MozaicTests/ProjectModelTests.swift; sourceTree = "<group>"; };
 		D86BB69D2BF67EF00054AC82 /* Mozaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mozaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MozaicApp.swift; sourceTree = "<group>"; };
 		D86BB6A22BF67EF00054AC82 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				7A6A6429C384F741DB44215D /* ImageCoderTests.swift */,
 				04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */,
 				4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */,
+				D4631F8AE6697824315DF118 /* ProjectModelTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */,
 				59B4EFBDFE35847FFE9B297D /* ImageStoreTests.swift in Sources */,
 				B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */,
+				F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

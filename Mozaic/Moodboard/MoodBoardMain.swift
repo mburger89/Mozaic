@@ -9,8 +9,12 @@ struct MoodBoardMain: View {
 				GridItem(.fixed(300 + pm.gridGap)),
 				GridItem(.fixed(300 + pm.gridGap))],
 					  spacing: pm.gridGap) {
-				ForEach(pm.imgC.enumerated(), id: \.element.id) { index, imgC in
-					ModuleWrapper(mbCell: MbCell(cellSpacing: pm.gridGap, cell: pm.cellWidth, twoCell: pm.twoCellWidth, img: imgC.image, index: index))
+				ForEach(pm.board.rows.enumerated(), id: \.element.id) { index, row in
+					ModuleWrapper(mbCell: MbCell(cellSpacing: pm.gridGap,
+												 cell: pm.cellWidth,
+												 twoCell: pm.twoCellWidth,
+												 slots: row.slots,
+												 index: index))
 				}
 			}.padding(.bottom, pm.halfGridGap)
 			if pm.showBoardInfo {
