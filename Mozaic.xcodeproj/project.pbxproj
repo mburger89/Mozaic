@@ -13,6 +13,7 @@
 		523BFFF17FB002588602C004 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A003C8F24B216C56DD155 /* SmokeTests.swift */; };
 		59B4EFBDFE35847FFE9B297D /* ImageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */; };
 		59BE0FEFD0DADB0840F1C5EE /* MozaicDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35646706C2262B55828E7FAD /* MozaicDocument.swift */; };
+		66D698E5FEB471C9CFB8B524 /* DroppedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6975C5A89126EF6DD42A7CAA /* DroppedImage.swift */; };
 		73383CC02CFA9197007150D7 /* Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* Modules.swift */; };
 		73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB22CFA9197007150D7 /* ProjectModel.swift */; };
 		73383CC32CFA9197007150D7 /* MoodBoardMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB92CFA9197007150D7 /* MoodBoardMain.swift */; };
@@ -24,6 +25,7 @@
 		73E9A6D32E9075B20083CF99 /* Bottominfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D22E9075B20083CF99 /* Bottominfo.swift */; };
 		73E9A6D62E9076BB0083CF99 /* ModWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */; };
 		8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35860FD3503293935E5EF01 /* BoardManifest.swift */; };
+		94328EBAAD3BD2A3C7D3234F /* DroppedImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93CB2872ECADA3213233153 /* DroppedImageTests.swift */; };
 		B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */; };
 		BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */; };
 		C42603667FCBE9E1CACF4026 /* MozaicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1026FFECF9D0447E26238E /* MozaicUITests.swift */; };
@@ -61,6 +63,7 @@
 		54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifestTests.swift; path = MozaicTests/BoardManifestTests.swift; sourceTree = "<group>"; };
 		64A3D430387C325D368C32D8 /* ImageStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageStore.swift; path = Document/ImageStore.swift; sourceTree = "<group>"; };
 		668A003C8F24B216C56DD155 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SmokeTests.swift; path = MozaicTests/SmokeTests.swift; sourceTree = "<group>"; };
+		6975C5A89126EF6DD42A7CAA /* DroppedImage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DroppedImage.swift; sourceTree = "<group>"; };
 		73383CB22CFA9197007150D7 /* ProjectModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectModel.swift; sourceTree = "<group>"; };
 		73383CB42CFA9197007150D7 /* MbImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MbImage.swift; sourceTree = "<group>"; };
 		73383CB52CFA9197007150D7 /* Modules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modules.swift; sourceTree = "<group>"; };
@@ -85,6 +88,7 @@
 		D86BB6B02BF67EF10054AC82 /* MozaicTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MozaicTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6BA2BF67EF10054AC82 /* MozaicUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MozaicUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA1026FFECF9D0447E26238E /* MozaicUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITests.swift; path = MozaicUITests/MozaicUITests.swift; sourceTree = "<group>"; };
+		F93CB2872ECADA3213233153 /* DroppedImageTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DroppedImageTests.swift; path = MozaicTests/DroppedImageTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +125,7 @@
 				04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */,
 				4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */,
 				D4631F8AE6697824315DF118 /* ProjectModelTests.swift */,
+				F93CB2872ECADA3213233153 /* DroppedImageTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -151,6 +156,7 @@
 				73383CB92CFA9197007150D7 /* MoodBoardMain.swift */,
 				73E9A6D22E9075B20083CF99 /* Bottominfo.swift */,
 				73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */,
+				6975C5A89126EF6DD42A7CAA /* DroppedImage.swift */,
 			);
 			path = Moodboard;
 			sourceTree = "<group>";
@@ -368,6 +374,7 @@
 				24B6042EE6CA41313DFA86F5 /* ImageStore.swift in Sources */,
 				DAA36D6AF24E988192102B80 /* UTType+Mozaic.swift in Sources */,
 				59BE0FEFD0DADB0840F1C5EE /* MozaicDocument.swift in Sources */,
+				66D698E5FEB471C9CFB8B524 /* DroppedImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +388,7 @@
 				59B4EFBDFE35847FFE9B297D /* ImageStoreTests.swift in Sources */,
 				B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */,
 				F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */,
+				94328EBAAD3BD2A3C7D3234F /* DroppedImageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

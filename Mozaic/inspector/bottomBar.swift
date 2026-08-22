@@ -25,6 +25,13 @@ struct BottomBar: View {
 							.frame(width: gridItemWidth, height: gridItemHeight)
 							.background(Material.thin)
 							.clipShape(.rect(cornerRadius: 10.0))
+							.draggable(DroppedImage.reference(id)) {
+								image
+									.resizable()
+									.aspectRatio(contentMode: .fill)
+									.frame(width: gridItemWidth / 2.0, height: gridItemHeight / 2.0)
+									.clipShape(.rect(cornerRadius: 10))
+							}
 					}
 				}
 			}

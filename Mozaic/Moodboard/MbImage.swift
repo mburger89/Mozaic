@@ -10,10 +10,17 @@ struct MbImage: View {
 
 	var body: some View {
 		Group {
-			if let image = pm.image(for: imageID) {
+			if let imageID, let image = pm.image(for: imageID) {
 				image
 					.resizable()
 					.aspectRatio(contentMode: .fill)
+					.draggable(DroppedImage.reference(imageID)) {
+						image
+							.resizable()
+							.aspectRatio(contentMode: .fill)
+							.frame(width: imgWidth / 2, height: imgHeight / 2)
+							.clipShape(.rect(cornerRadius: pm.cellRadius))
+					}
 			} else {
 				Image("OGbgImg")
 					.resizable()
@@ -22,6 +29,16 @@ struct MbImage: View {
 		}
 		.frame(width: imgWidth, height: imgHeight)
 		.background(Material.thin)
+		.dropDestination(for: DroppedImage.self) { items, _ in
+			guard let first = items.first else { return false }
+			do {
+				try pm.accept(first, row: indexes[0], slot: indexes[1])
+				return true
+			} catch {
+				print("Drop rejected:", error)
+				return false
+			}
+		} isTargeted: { isTarget = $0 }
 		.contentShape(.rect(cornerRadius: pm.cellRadius).inset(by: 20))
 		.overlay {
 			RoundedRectangle(cornerRadius: pm.cellRadius)
