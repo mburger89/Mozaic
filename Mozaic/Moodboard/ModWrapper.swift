@@ -98,7 +98,7 @@ struct ModuleWrapper: View {
 	}
 
 	private func setModule(_ module: Module) {
-		pm.setModule(module, row: mbCell.index)
+		pm.withUndo("Change Layout") { $0.setModule(module, row: mbCell.index) }
 		isPickingModule = false
 	}
 }

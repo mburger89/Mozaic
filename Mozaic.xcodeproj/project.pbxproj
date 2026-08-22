@@ -36,6 +36,7 @@
 		DB6C9A824A59B23ED973BF8A /* BoardMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8A5C4E33E22CCDDAB4ADBC /* BoardMirror.swift */; };
 		F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4631F8AE6697824315DF118 /* ProjectModelTests.swift */; };
 		FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6A6429C384F741DB44215D /* ImageCoderTests.swift */; };
+		FE83BCB60A4332D467396751 /* UndoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4217777C020BEAC731A7AE /* UndoTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 
 /* Begin PBXFileReference section */
 		04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageStoreTests.swift; path = MozaicTests/ImageStoreTests.swift; sourceTree = "<group>"; };
+		0B4217777C020BEAC731A7AE /* UndoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UndoTests.swift; path = MozaicTests/UndoTests.swift; sourceTree = "<group>"; };
 		33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UTType+Mozaic.swift"; path = "Document/UTType+Mozaic.swift"; sourceTree = "<group>"; };
 		35646706C2262B55828E7FAD /* MozaicDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocument.swift; path = Document/MozaicDocument.swift; sourceTree = "<group>"; };
 		4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocumentTests.swift; path = MozaicTests/MozaicDocumentTests.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */,
 				D4631F8AE6697824315DF118 /* ProjectModelTests.swift */,
 				F93CB2872ECADA3213233153 /* DroppedImageTests.swift */,
+				0B4217777C020BEAC731A7AE /* UndoTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -389,6 +392,7 @@
 				B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */,
 				F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */,
 				94328EBAAD3BD2A3C7D3234F /* DroppedImageTests.swift in Sources */,
+				FE83BCB60A4332D467396751 /* UndoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -157,4 +157,46 @@ final class ProjectModel {
 		}
 		return id
 	}
+
+	// MARK: Undo
+
+	/// Supplied by the document's environment. Nil in previews and tests that
+	/// do not exercise undo.
+	@ObservationIgnored var undoManager: UndoManager?
+
+	/// Runs a change and registers its inverse with `undoManager`.
+	///
+	/// The whole `Board` is a value type, so capturing it before the change is
+	/// a cheap and complete snapshot — no per-property undo bookkeeping.
+	/// Restoring goes through `restore(_:)`, the one path past `private(set)
+	/// var board`, so the disk mirror always stays in sync, undo included.
+	///
+	/// If `change` turns out not to have altered the board — a refused drop,
+	/// say — nothing is registered, so the Edit menu never grows a
+	/// do-nothing "Undo" entry.
+	///
+	/// Brackets the registration in its own `beginUndoGrouping`/
+	/// `endUndoGrouping` pair. `UndoManager`'s automatic per-event grouping
+	/// only fires while AppKit is dispatching a real event; call
+	/// `registerUndo` outside that (as a plain, freshly-made `UndoManager()`
+	/// does, and as any manager does when `groupsByEvent` is off) and it
+	/// raises `NSInternalInconsistencyException: ... must begin a group
+	/// before registering undo`. Opening the group ourselves makes every
+	/// call site correct regardless of context. Nesting is harmless: during
+	/// a real UI event this group nests inside AppKit's own per-event group,
+	/// so a slider drag that calls `withUndo` many times still collapses
+	/// into one ⌘Z, and during `undo()`/`redo()` the same bracket is exactly
+	/// how the inverse action gets registered for the other direction.
+	func withUndo(_ name: String, _ change: (ProjectModel) -> Void) {
+		let before = board
+		change(self)
+		guard let undoManager, board != before else { return }
+
+		undoManager.beginUndoGrouping()
+		undoManager.setActionName(name)
+		undoManager.registerUndo(withTarget: self) { model in
+			model.withUndo(name) { $0.restore(before) }
+		}
+		undoManager.endUndoGrouping()
+	}
 }

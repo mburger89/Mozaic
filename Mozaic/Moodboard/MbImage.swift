@@ -31,12 +31,16 @@ struct MbImage: View {
 		.background(Material.thin)
 		.dropDestination(for: DroppedImage.self) { items, _ in
 			guard let first = items.first else { return false }
-			do {
-				return try pm.accept(first, row: indexes[0], slot: indexes[1])
-			} catch {
-				print("Drop rejected:", error)
-				return false
+			var accepted = false
+			pm.withUndo("Move Image") { model in
+				do {
+					accepted = try model.accept(first, row: indexes[0], slot: indexes[1])
+				} catch {
+					print("Drop rejected:", error)
+					accepted = false
+				}
 			}
+			return accepted
 		} isTargeted: { isTarget = $0 }
 		.contentShape(.rect(cornerRadius: pm.cellRadius).inset(by: 20))
 		.overlay {

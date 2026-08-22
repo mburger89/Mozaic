@@ -37,6 +37,7 @@ struct ContentView: View {
 	@State private var showSettings: Bool = false
 	@State private var importing: Bool = false
 	@State private var fileexporting: Bool = false
+	@Environment(\.undoManager) private var undoManager
 	var body: some View {
 		NavigationSplitView {
 			ScrollView(.vertical) {}
@@ -65,7 +66,18 @@ struct ContentView: View {
 									}
 									defer { file.stopAccessingSecurityScopedResource() }
 									do {
-										try pm.importImage(try Data(contentsOf: file))
+										let data = try Data(contentsOf: file)
+										var importError: Error?
+										pm.withUndo("Import Image") { model in
+											do {
+												try model.importImage(data)
+											} catch {
+												importError = error
+											}
+										}
+										if let importError {
+											throw importError
+										}
 									} catch {
 										print("Failed to import image:", error)
 									}
@@ -82,10 +94,16 @@ struct ContentView: View {
 							Task {
 								for item in selectedItems {
 									guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
-									do {
-										try pm.importImage(data)
-									} catch {
-										print("Failed to import image:", error)
+									var importError: Error?
+									pm.withUndo("Import Image") { model in
+										do {
+											try model.importImage(data)
+										} catch {
+											importError = error
+										}
+									}
+									if let importError {
+										print("Failed to import image:", importError)
 									}
 								}
 							}
@@ -132,6 +150,9 @@ struct ContentView: View {
 			#if os(macOS)
 			.tabViewStyle(.grouped)
 			#endif
+		}
+		.onChange(of: undoManager, initial: true) {
+			pm.undoManager = undoManager
 		}
 	}
 	
