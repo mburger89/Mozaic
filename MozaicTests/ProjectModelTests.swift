@@ -185,6 +185,22 @@ import UniformTypeIdentifiers
 		#expect(model.mirror.snapshot.images[id] == nil)
 	}
 
+	@Test func aDirectImageStoreMutationAutomaticallyReachesTheMirror() throws {
+		// `pm.images` is a reference type reachable from outside `ProjectModel`
+		// (Task 10's `pm.images.reduceFileSize()` is exactly this shape).
+		// `ImageStore.didChange` closes that hole: it must sync the mirror on
+		// its own, with no `model.syncMirror()` call from the test at all,
+		// unlike `aDirectImageStoreMutationReachesTheMirrorOnceSynced` above.
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 0, slot: 0)
+		#expect(model.mirror.snapshot.images[id] != nil)
+
+		model.images.remove(id)
+
+		#expect(model.mirror.snapshot.images[id] == nil)
+	}
+
 	@Test func theMirrorIsSeededByTheInitializer() throws {
 		let id = UUID()
 		let stored = StoredImage(data: try imageData(), contentType: .png,

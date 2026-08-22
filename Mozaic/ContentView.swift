@@ -59,7 +59,10 @@ struct ContentView: View {
 						) { result in
 							switch result {
 								case .success(let file):
-									guard file.startAccessingSecurityScopedResource() else { return }
+									guard file.startAccessingSecurityScopedResource() else {
+										print("Failed to access security-scoped resource for \(file)")
+										return
+									}
 									defer { file.stopAccessingSecurityScopedResource() }
 									do {
 										try pm.importImage(try Data(contentsOf: file))
@@ -79,7 +82,11 @@ struct ContentView: View {
 							Task {
 								for item in selectedItems {
 									guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
-									try? pm.importImage(data)
+									do {
+										try pm.importImage(data)
+									} catch {
+										print("Failed to import image:", error)
+									}
 								}
 							}
 						}

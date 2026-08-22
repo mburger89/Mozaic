@@ -102,6 +102,41 @@ import UniformTypeIdentifiers
 		#expect(store.decodeCountForTesting <= 1)
 	}
 
+	@Test func didChangeFiresForAddInsertAndRemove() throws {
+		let store = ImageStore()
+		var fireCount = 0
+		store.didChange = { fireCount += 1 }
+
+		let added = try store.add(try makeImage(), quality: .standard)
+		#expect(fireCount == 1)
+
+		let insertedID = UUID()
+		store.insert(StoredImage(data: try makeImage(width: 41), contentType: .png,
+								 pixelWidth: 41, pixelHeight: 30),
+					for: insertedID)
+		#expect(fireCount == 2)
+
+		store.remove(added)
+		#expect(fireCount == 3)
+	}
+
+	@Test func didChangeDoesNotFireFromDecoding() throws {
+		// `image(for:)` populates a decode cache and, on bad bytes, a
+		// decode-failure set. Neither is persisted state, so firing here
+		// would rebuild the mirror on every render pass -- a performance
+		// regression, not just a correctness nit.
+		let store = ImageStore()
+		let id = try store.add(try makeImage(), quality: .standard)
+		var fireCount = 0
+		store.didChange = { fireCount += 1 }
+
+		_ = store.image(for: id)
+		_ = store.image(for: id)
+		_ = store.image(for: UUID())   // unknown ID: still no fire
+
+		#expect(fireCount == 0)
+	}
+
 	@Test func insertDoesNotOverwriteExistingBytesForAnID() throws {
 		// Bytes are immutable once stored under an ID: MozaicDocument's
 		// incremental save reuses an existing file wrapper whenever the

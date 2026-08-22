@@ -36,6 +36,25 @@ final class ImageStore {
 	/// Test-only counter proving memoization holds.
 	@ObservationIgnored private(set) var decodeCountForTesting = 0
 
+	/// Fires after `storedImages` changes, so `ProjectModel` can keep its
+	/// disk-mirror in sync even when a caller mutates the store directly,
+	/// bypassing every `ProjectModel` method entirely -- the shape of
+	/// Task 10's `pm.images.reduceFileSize()` call from the settings
+	/// inspector.
+	///
+	/// Must fire ONLY on changes to `storedImages`. It must NOT fire from
+	/// `image(for:)` populating the decode cache or `decodeFailures`: those
+	/// are not persisted state, and firing there would rebuild the mirror on
+	/// every render pass -- a serious performance regression.
+	///
+	/// `nonisolated(unsafe)`: `ProjectModel` wires this from its own
+	/// `nonisolated init`, a single-threaded moment before `self` (or this
+	/// store) is reachable from anywhere else, so there is no real race to
+	/// guard against. Every *call* still happens on the main actor, because
+	/// the only call sites (`add`, `insert`, `remove` below) are themselves
+	/// main-actor-isolated methods of this class.
+	@ObservationIgnored nonisolated(unsafe) var didChange: (@MainActor () -> Void)?
+
 	/// `nonisolated`: `MozaicDocument.init(configuration:)` builds the store
 	/// while reading a package, and SwiftUI does not contract that read to
 	/// the main actor. Safe because this only places a `Sendable` dictionary
@@ -60,6 +79,7 @@ final class ImageStore {
 									   contentType: prepared.contentType,
 									   pixelWidth: prepared.pixelWidth,
 									   pixelHeight: prepared.pixelHeight)
+		didChange?()
 		return id
 	}
 
@@ -83,12 +103,14 @@ final class ImageStore {
 		storedImages[id] = image
 		decoded[id] = nil
 		decodeFailures.remove(id)
+		didChange?()
 	}
 
 	func remove(_ id: UUID) {
 		storedImages[id] = nil
 		decoded[id] = nil
 		decodeFailures.remove(id)
+		didChange?()
 	}
 
 	/// The decoded image, decoded at most once per ID per session.

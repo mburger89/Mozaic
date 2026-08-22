@@ -50,6 +50,11 @@ final class ProjectModel {
 		self.images = ImageStore(storedImages: storedImages)
 		self.mirror = mirror
 		mirror.update(board: board, images: storedImages)
+		// `self` is fully initialized above this line: every stored property
+		// has a value, so capturing it here (even weakly) is safe. Closes the
+		// hole where a caller mutates `images` directly -- bypassing every
+		// `ProjectModel` method -- without the mirror ever finding out.
+		images.didChange = { [weak self] in self?.syncMirror() }
 	}
 
 	// MARK: Mirror
