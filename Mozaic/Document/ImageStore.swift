@@ -19,6 +19,19 @@ struct StoredImage: Sendable {
 	var pixelHeight: Int
 }
 
+/// What `ImageStore.reduceFileSize()` accomplished, for the inspector to
+/// report to the user instead of closing the confirmation dialog and saying
+/// nothing.
+struct ReductionOutcome: Sendable, Equatable {
+	/// Bytes freed across every image that was actually reduced.
+	var bytesSaved: Int
+	/// Images left untouched because they could not be prepared -- most
+	/// likely bytes that arrived corrupt via the document-read path, which
+	/// tolerates them at open time. Not an error: the rest of the run still
+	/// completed.
+	var failedCount: Int
+}
+
 /// Owns every image in a document and hands views decoded `Image` values.
 ///
 /// Decoding is memoized. Views resolve images by ID on every render pass, so
@@ -162,6 +175,14 @@ final class ImageStore {
 	/// Destructive and deliberately not undoable: the discarded detail is
 	/// gone, so registering an inverse would be a lie.
 	///
+	/// Skip-and-continue, not all-or-nothing: an image that fails
+	/// `ImageCoder.prepared` (reachable via corrupt bytes that arrived
+	/// through the document-read path, which tolerates them at open time) is
+	/// left exactly as it is, and every other image still gets reduced.
+	/// `ReductionOutcome.failedCount` tells the caller how many were skipped,
+	/// so a run that helps 49 images and skips one corrupt one is not
+	/// reported to the user as if nothing happened.
+	///
 	/// `async`: re-encoding up to ~50 stored images -- some potentially
 	/// multi-megapixel -- synchronously on the main actor would freeze the UI
 	/// for seconds. The actual decode/downscale/re-encode work happens in
@@ -173,10 +194,12 @@ final class ImageStore {
 	/// `Sendable`, so handing a snapshot of the dictionary across that hop is
 	/// safe.
 	@discardableResult
-	func reduceFileSize() async throws -> Int {
+	func reduceFileSize() async -> ReductionOutcome {
 		let before = totalByteCount
-		let reduced = try await Self.reduced(from: storedImages)
-		guard !reduced.isEmpty else { return 0 }
+		let (reduced, failedCount) = await Self.reduced(from: storedImages)
+		guard !reduced.isEmpty else {
+			return ReductionOutcome(bytesSaved: 0, failedCount: failedCount)
+		}
 
 		for (id, image) in reduced {
 			storedImages[id] = image
@@ -189,23 +212,40 @@ final class ImageStore {
 			decodeFailures.remove(id)
 		}
 		didChange?()
-		return before - totalByteCount
+		return ReductionOutcome(bytesSaved: before - totalByteCount, failedCount: failedCount)
 	}
 
 	/// The CPU-heavy half of `reduceFileSize()`, isolated to nothing so it
 	/// runs off the main actor. Returns only the entries that actually got
-	/// smaller; the caller applies those back to `storedImages`.
-	nonisolated private static func reduced(from images: [UUID: StoredImage]) async throws -> [UUID: StoredImage] {
+	/// smaller, plus how many entries could not even be prepared; the caller
+	/// applies the former back to `storedImages` and reports the latter.
+	///
+	/// Yields every few images: without a suspension point in the loop body,
+	/// once scheduled this would monopolize one cooperative-pool thread for
+	/// its entire duration. That never blocks the UI -- the actual
+	/// requirement -- but yielding periodically is more cooperative toward
+	/// other background work competing for the pool.
+	nonisolated private static func reduced(
+		from images: [UUID: StoredImage]
+	) async -> (results: [UUID: StoredImage], failedCount: Int) {
 		var result: [UUID: StoredImage] = [:]
-		for (id, image) in images {
-			let prepared = try ImageCoder.prepared(image.data, quality: .standard)
-			guard prepared.data.count < image.data.count else { continue }
-			result[id] = StoredImage(data: prepared.data,
-									 contentType: prepared.contentType,
-									 pixelWidth: prepared.pixelWidth,
-									 pixelHeight: prepared.pixelHeight)
+		var failedCount = 0
+		for (index, (id, image)) in images.enumerated() {
+			if index > 0, index.isMultiple(of: 8) {
+				await Task.yield()
+			}
+			do {
+				let prepared = try ImageCoder.prepared(image.data, quality: .standard)
+				guard prepared.data.count < image.data.count else { continue }
+				result[id] = StoredImage(data: prepared.data,
+										 contentType: prepared.contentType,
+										 pixelWidth: prepared.pixelWidth,
+										 pixelHeight: prepared.pixelHeight)
+			} catch {
+				failedCount += 1
+			}
 		}
-		return result
+		return (result, failedCount)
 	}
 
 	func metadata(for ids: Set<UUID>) -> [StoredImageMeta] {

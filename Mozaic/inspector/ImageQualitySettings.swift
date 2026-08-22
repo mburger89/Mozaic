@@ -13,6 +13,11 @@ struct ImageQualitySettings: View {
 	var qualityBinding: Binding<ImageQuality>
 
 	@State private var isConfirmingReduce = false
+	/// The last run's outcome, so the confirmation dialog closing is never
+	/// the last the user hears from this command -- especially when nothing
+	/// could be reduced, which would otherwise look identical to the button
+	/// silently doing nothing at all.
+	@State private var lastReduction: ReductionOutcome?
 
 	var body: some View {
 		Picker("Image Quality", selection: qualityBinding) {
@@ -35,11 +40,30 @@ struct ImageQualitySettings: View {
 			titleVisibility: .visible
 		) {
 			Button("Reduce", role: .destructive) {
-				Task { try? await pm.images.reduceFileSize() }
+				Task { lastReduction = await pm.images.reduceFileSize() }
 			}
 			Button("Cancel", role: .cancel) { }
 		} message: {
 			Text("Discarded detail cannot be recovered, and this cannot be undone.")
+		}
+		if let lastReduction {
+			Text(reductionSummary(lastReduction))
+				.foregroundStyle(.secondary)
+		}
+	}
+
+	private func reductionSummary(_ outcome: ReductionOutcome) -> String {
+		let saved = Int64(outcome.bytesSaved).formatted(.byteCount(style: .file))
+		let images = outcome.failedCount == 1 ? "image" : "images"
+		switch (outcome.bytesSaved > 0, outcome.failedCount > 0) {
+		case (true, false):
+			return "Reduced by \(saved)."
+		case (true, true):
+			return "Reduced by \(saved); couldn't reduce \(outcome.failedCount) \(images)."
+		case (false, true):
+			return "Couldn't reduce \(outcome.failedCount) \(images)."
+		case (false, false):
+			return "Nothing to reduce -- every image is already within the cap."
 		}
 	}
 }

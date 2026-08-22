@@ -136,8 +136,8 @@ import UniformTypeIdentifiers
 		let firstChild = try #require(first.fileWrappers?["images"]?.fileWrappers?["\(id.uuidString).jpeg"])
 
 		let store = ImageStore(storedImages: snapshot.images)
-		let saved = try await store.reduceFileSize()
-		#expect(saved > 0)
+		let outcome = await store.reduceFileSize()
+		#expect(outcome.bytesSaved > 0)
 		let reducedStored = try #require(store.stored(for: id))
 		#expect(reducedStored.data.count < original.count)   // sanity: reduction really happened
 

@@ -35,9 +35,10 @@ import UniformTypeIdentifiers
 		let id = try store.add(try largeJPEG(), quality: .full)
 		let before = store.totalByteCount
 
-		let saved = try await store.reduceFileSize()
+		let outcome = await store.reduceFileSize()
 
-		#expect(saved > 0)
+		#expect(outcome.bytesSaved > 0)
+		#expect(outcome.failedCount == 0)
 		#expect(store.totalByteCount < before)
 		let stored = try #require(store.stored(for: id))
 		#expect(stored.contentType == .jpeg)                       // format preserved
@@ -60,8 +61,40 @@ import UniformTypeIdentifiers
 		let id = try store.add(out as Data, quality: .standard)
 		let before = try #require(store.stored(for: id)).data
 
-		#expect(try await store.reduceFileSize() == 0)
+		let outcome = await store.reduceFileSize()
+		#expect(outcome.bytesSaved == 0)
+		#expect(outcome.failedCount == 0)
 		#expect(store.stored(for: id)?.data == before)   // byte-identical
+	}
+
+	/// A single corrupt image (reachable via `insert(_:for:)`, the
+	/// document-read path, which tolerates bad bytes at open time) must not
+	/// abort reduction for every other image in the document. The regression
+	/// this guards: `reduceFileSize` used to propagate the first
+	/// `ImageCoder.prepared` failure and abort the whole run, and the button
+	/// that calls it swallowed the thrown error entirely -- so a board that
+	/// had lost one image would silently do nothing, forever, when asked to
+	/// shrink the rest.
+	@Test func reducingSkipsUndecodableImagesAndStillReducesTheRest() async throws {
+		let store = ImageStore()
+		let goodA = try store.add(try largeJPEG(), quality: .full)
+		let goodB = try store.add(try largeJPEG(), quality: .full)
+		let corruptID = UUID()
+		let corruptData = Data("not an image".utf8)
+		store.insert(StoredImage(data: corruptData, contentType: .jpeg, pixelWidth: 2400, pixelHeight: 1600),
+					for: corruptID)
+		let before = store.totalByteCount
+
+		let outcome = await store.reduceFileSize()
+
+		#expect(outcome.bytesSaved > 0)
+		#expect(outcome.failedCount == 1)
+		#expect(store.totalByteCount < before)
+		#expect(store.stored(for: corruptID)?.data == corruptData)   // left exactly as it was
+		for id in [goodA, goodB] {
+			let stored = try #require(store.stored(for: id))
+			#expect(max(stored.pixelWidth, stored.pixelHeight) == ImageQuality.standardMaxPixel)
+		}
 	}
 
 	/// `ImageStore.reduceFileSize()` mutates `storedImages` through the
@@ -77,7 +110,7 @@ import UniformTypeIdentifiers
 		let id = try pm.importImage(try largeJPEG())
 		let beforeMirror = try #require(pm.mirror.snapshot.images[id]).data.count
 
-		_ = try await pm.images.reduceFileSize()
+		_ = await pm.images.reduceFileSize()
 
 		let afterMirror = try #require(pm.mirror.snapshot.images[id]).data.count
 		#expect(afterMirror < beforeMirror)
@@ -96,7 +129,7 @@ import UniformTypeIdentifiers
 		_ = store.image(for: id)                      // populate the decode cache
 		let decodesBeforeReduction = store.decodeCountForTesting
 
-		_ = try await store.reduceFileSize()
+		_ = await store.reduceFileSize()
 		_ = store.image(for: id)
 
 		#expect(store.decodeCountForTesting == decodesBeforeReduction + 1)
