@@ -93,4 +93,132 @@ import UniformTypeIdentifiers
 		#expect(model.halfGridGap == 10)
 		#expect(model.cellWidth == ProjectModel.baseCellWidth - 10)
 	}
+
+	@Test func restoringSwapsTheWholeBoard() throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 0, slot: 0)
+
+		var replacement = Board()
+		replacement.projectName = "Restored"
+		model.restore(replacement)
+
+		#expect(model.board.projectName == "Restored")
+		#expect(model.board.rows[0].slots[0] == nil)
+	}
+
+	// MARK: The persisted-state mirror
+	//
+	// `MozaicDocument.snapshot(contentType:)` is `nonisolated` and returns the
+	// mirror, never the live model, so a mutation that forgets to refresh the
+	// mirror is a silent data-loss bug: the edit shows on screen and is absent
+	// from the saved file. One test per mutating path, so adding a mutation
+	// without syncing fails here rather than in someone's document.
+
+	@Test func placingUpdatesTheMirror() throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 2, slot: 1)
+
+		#expect(model.mirror.snapshot.board.rows[2].slots[1] == id)
+	}
+
+	@Test func clearingASlotUpdatesTheMirror() throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 0, slot: 0)
+		model.clearSlot(row: 0, slot: 0)
+
+		#expect(model.mirror.snapshot.board.rows[0].slots[0] == nil)
+	}
+
+	@Test func settingAModuleUpdatesTheMirror() {
+		let model = ProjectModel()
+		model.setModule(.fourshort, row: 3)
+
+		#expect(model.mirror.snapshot.board.rows[3].module == .fourshort)
+	}
+
+	@Test func importingUpdatesTheMirrorsBoardAndImages() throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+
+		let mirrored = model.mirror.snapshot
+		#expect(mirrored.board.tray == [id])
+		#expect(mirrored.images[id] != nil)
+		#expect(mirrored.images[id]?.data == model.images.stored(for: id)?.data)
+	}
+
+	@Test func aSettingsPassthroughUpdatesTheMirror() {
+		let model = ProjectModel()
+		model.gridGap = 42
+		#expect(model.mirror.snapshot.board.gridGap == 42)
+
+		model.projectName = "Kitchen"
+		#expect(model.mirror.snapshot.board.projectName == "Kitchen")
+	}
+
+	@Test func restoringUpdatesTheMirror() throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 0, slot: 0)
+
+		var replacement = Board()
+		replacement.projectName = "Restored"
+		model.restore(replacement)
+
+		let mirrored = model.mirror.snapshot
+		#expect(mirrored.board.projectName == "Restored")
+		#expect(mirrored.board.rows[0].slots[0] == nil)
+	}
+
+	@Test func aDirectImageStoreMutationReachesTheMirrorOnceSynced() throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 0, slot: 0)
+
+		// `pm.images` is reachable from outside `ProjectModel`, so a caller
+		// that mutates it (Reduce File Size, for one) has to say so.
+		model.images.remove(id)
+		model.syncMirror()
+
+		#expect(model.mirror.snapshot.images[id] == nil)
+	}
+
+	@Test func theMirrorIsSeededByTheInitializer() throws {
+		let id = UUID()
+		let stored = StoredImage(data: try imageData(), contentType: .png,
+								 pixelWidth: 8, pixelHeight: 8)
+		var board = Board()
+		board.projectName = "Seeded"
+		board.rows[0].slots[0] = id
+
+		let model = ProjectModel(board: board, storedImages: [id: stored])
+
+		let mirrored = model.mirror.snapshot
+		#expect(mirrored.board.projectName == "Seeded")
+		#expect(mirrored.board.rows[0].slots[0] == id)
+		#expect(mirrored.images[id] != nil)
+	}
+
+	/// The whole reason the mirror exists: AppKit reads the snapshot from a
+	/// background dispatch queue during `NSDocument writeToURL:`.
+	@Test func theMirrorIsReadableOffTheMainActor() async throws {
+		let model = ProjectModel()
+		let id = try model.importImage(try imageData())
+		model.place(id, row: 1, slot: 1)
+
+		let mirror = model.mirror
+		let (mirrored, offMainActor) = await Task.detached {
+			(mirror.snapshot, isOffTheMainThread())
+		}.value
+
+		#expect(offMainActor)
+		#expect(mirrored.board.rows[1].slots[1] == id)
+		#expect(mirrored.images[id] != nil)
+	}
 }
+
+/// `Thread.isMainThread` is unavailable from async contexts, so the check
+/// lives in a synchronous function the detached task can call.
+private nonisolated func isOffTheMainThread() -> Bool { !Thread.isMainThread }

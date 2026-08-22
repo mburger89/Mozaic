@@ -158,4 +158,51 @@ import UniformTypeIdentifiers
 		let error = #expect(throws: CocoaError.self) { try MozaicDocument.read(wrapper) }
 		#expect(error?.code == .fileReadCorruptFile)
 	}
+
+	// MARK: snapshot(contentType:) off the main actor
+	//
+	// AppKit calls this from `-[NSDocument writeToURL:...]` on
+	// `com.apple.root.default-qos`. A main-actor-isolated version traps in
+	// `_checkExpectedExecutor` the first time the user saves, so these tests
+	// call it exactly the way AppKit does: from somewhere that is not the
+	// main actor.
+
+	@Test func snapshotIsCallableOffTheMainActor() async throws {
+		let document = MozaicDocument()
+		let id = try document.model.importImage(try makeImageData())
+		document.model.place(id, row: 0, slot: 0)
+		document.model.projectName = "Saved"
+
+		let (snapshot, offMainActor) = try await Task.detached {
+			(try document.snapshot(contentType: .mozaicBoard), isOffTheMainThread())
+		}.value
+
+		#expect(offMainActor)
+		#expect(snapshot.board.projectName == "Saved")
+		#expect(snapshot.board.rows[0].slots[0] == id)
+		#expect(snapshot.images[id] != nil)
+	}
+
+	/// The full save path as AppKit runs it: snapshot off the main actor, then
+	/// write the package from the value it returned.
+	@Test func aDocumentEditedOnTheMainActorWritesOffIt() async throws {
+		let document = MozaicDocument()
+		let id = try document.model.importImage(try makeImageData())
+		document.model.place(id, row: 1, slot: 2)
+
+		// `FileWrapper` is not `Sendable`, so it never leaves the writer —
+		// which is exactly how the real save path works too.
+		let read = try await Task.detached {
+			let snapshot = try document.snapshot(contentType: .mozaicBoard)
+			let wrapper = try MozaicDocument.makeFileWrapper(snapshot: snapshot, existing: nil)
+			return try MozaicDocument.read(wrapper)
+		}.value
+
+		#expect(read.board.rows[1].slots[2] == id)
+		#expect(read.images[id] != nil)
+	}
 }
+
+/// `Thread.isMainThread` is unavailable from async contexts, so the check
+/// lives in a synchronous function the detached task can call.
+private nonisolated func isOffTheMainThread() -> Bool { !Thread.isMainThread }

@@ -8,9 +8,10 @@ enum DocumentError: Error, Equatable {
 	case unsupportedVersion(Int)
 }
 
-/// Everything needed to write a document, captured on the main actor and
-/// handed to the background writer. `Sendable` because
-/// `fileWrapper(snapshot:configuration:)` is `nonisolated`.
+/// Everything needed to write a document, mirrored out of the live model and
+/// handed to the background writer. `Sendable` because both
+/// `snapshot(contentType:)` and `fileWrapper(snapshot:configuration:)` are
+/// `nonisolated`.
 struct BoardSnapshot: Sendable {
 	var board: Board
 	var images: [UUID: StoredImage]
@@ -22,8 +23,15 @@ struct BoardSnapshot: Sendable {
 /// `ReferenceFileDocument` rather than `FileDocument` because `ProjectModel`
 /// is an `@Observable` class — the value-type `FileDocument` would force it to
 /// become a struct — and because it supplies the `UndoManager`.
+///
+/// The class is `@MainActor` for the sake of the views that touch `model`, but
+/// every `ReferenceFileDocument` requirement is `nonisolated`: the protocol
+/// carries no actor annotation, and AppKit really does call
+/// `snapshot(contentType:)` off the main actor. That is why the conformance
+/// needs no `@preconcurrency` — there is no isolation mismatch left to
+/// suppress, and so no dynamic executor check to trap.
 @MainActor
-final class MozaicDocument: @preconcurrency ReferenceFileDocument {
+final class MozaicDocument: ReferenceFileDocument {
 	typealias Snapshot = BoardSnapshot
 
 	nonisolated static var readableContentTypes: [UTType] { [.mozaicBoard] }
@@ -36,12 +44,22 @@ final class MozaicDocument: @preconcurrency ReferenceFileDocument {
 	/// format, enforced on read.
 	nonisolated static let slotsPerRow = 4
 
-	var board: Board
-	let images: ImageStore
+	let model: ProjectModel
 
-	init() {
-		self.board = Board()
-		self.images = ImageStore()
+	/// What `snapshot(contentType:)` returns. The document owns it; the model
+	/// keeps it current. See `BoardMirror`.
+	nonisolated let mirror: BoardMirror
+
+	/// `nonisolated` for the same reason as `init(configuration:)`:
+	/// `DocumentGroup(newDocument:editor:)` takes a plain, nonisolated
+	/// closure, so a main-actor initializer here is another isolation
+	/// mismatch waiting to become a dynamic executor check. Nothing in it
+	/// needs the main actor — `BoardMirror.init` and `ProjectModel.init` are
+	/// both nonisolated.
+	nonisolated init() {
+		let mirror = BoardMirror()
+		self.mirror = mirror
+		self.model = ProjectModel(mirror: mirror)
 	}
 
 	/// `nonisolated`: SwiftUI's iOS document path is `UIDocument`-backed and
@@ -49,16 +67,26 @@ final class MozaicDocument: @preconcurrency ReferenceFileDocument {
 	/// this initializer to the main actor. Leaving it isolated would put a
 	/// dynamic isolation check -- a crash on opening a file -- in the read
 	/// path. Nothing here needs the main actor: `read` is nonisolated,
-	/// `Board` is a nonisolated value type, and `ImageStore`'s initializer is
-	/// nonisolated too.
+	/// `Board` is a nonisolated value type, and `ProjectModel`'s initializer
+	/// is nonisolated too.
 	nonisolated init(configuration: ReadConfiguration) throws {
 		let snapshot = try Self.read(configuration.file)
-		self.board = snapshot.board
-		self.images = ImageStore(storedImages: snapshot.images)
+		let mirror = BoardMirror(board: snapshot.board, images: snapshot.images)
+		self.mirror = mirror
+		self.model = ProjectModel(board: snapshot.board,
+								  storedImages: snapshot.images,
+								  mirror: mirror)
 	}
 
-	func snapshot(contentType: UTType) throws -> BoardSnapshot {
-		BoardSnapshot(board: board, images: images.storedImages)
+	/// `nonisolated`: AppKit calls this from `-[NSDocument writeToURL:...]`,
+	/// which runs on `com.apple.root.default-qos`, not the main actor. A
+	/// main-actor-isolated version compiles only behind `@preconcurrency`, and
+	/// then traps in `_checkExpectedExecutor` the first time the user presses
+	/// Cmd+S. Reading the mirror instead makes the isolation honest: no hop,
+	/// no `assumeIsolated`, no blocking, and no race — the mirror is under a
+	/// `Mutex` and the main thread stays live throughout the save.
+	nonisolated func snapshot(contentType: UTType) throws -> BoardSnapshot {
+		mirror.snapshot
 	}
 
 	nonisolated func fileWrapper(snapshot: BoardSnapshot,

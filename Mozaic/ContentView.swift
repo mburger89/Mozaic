@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 import PhotosUI
 import UniformTypeIdentifiers
 
@@ -32,7 +31,8 @@ struct MoodBoardImage: Transferable, FileDocument {
 }
 
 struct ContentView: View {
-	@State var pm : ProjectModel = ProjectModel()
+	let document: MozaicDocument
+	private var pm: ProjectModel { document.model }
 	@State private var selectedItems: [PhotosPickerItem] = []
 	@State private var showSettings: Bool = false
 	@State private var importing: Bool = false
@@ -154,6 +154,6 @@ struct ContentView: View {
 }
 
 #Preview {
-	ContentView().environment(ProjectModel())
+	ContentView(document: MozaicDocument())
 }
 
