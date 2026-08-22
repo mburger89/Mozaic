@@ -150,6 +150,64 @@ final class ImageStore {
 		return "\(id.uuidString).\(ext)"
 	}
 
+	/// Bytes currently held, for showing document size in the inspector.
+	var totalByteCount: Int {
+		storedImages.values.reduce(0) { $0 + $1.data.count }
+	}
+
+	/// Re-encodes every stored image down to the Standard cap, each to its own
+	/// format. Images already within the cap, and formats that cannot round
+	/// trip, are left byte-identical.
+	///
+	/// Destructive and deliberately not undoable: the discarded detail is
+	/// gone, so registering an inverse would be a lie.
+	///
+	/// `async`: re-encoding up to ~50 stored images -- some potentially
+	/// multi-megapixel -- synchronously on the main actor would freeze the UI
+	/// for seconds. The actual decode/downscale/re-encode work happens in
+	/// `Self.reduced(from:)`, a `nonisolated async` function with no actor of
+	/// its own, so calling it with `await` runs it on the background
+	/// cooperative pool instead of the main actor. Only gathering
+	/// `storedImages` beforehand and writing the results back afterward touch
+	/// main-actor state, and both are cheap. `StoredImage` and `Data` are
+	/// `Sendable`, so handing a snapshot of the dictionary across that hop is
+	/// safe.
+	@discardableResult
+	func reduceFileSize() async throws -> Int {
+		let before = totalByteCount
+		let reduced = try await Self.reduced(from: storedImages)
+		guard !reduced.isEmpty else { return 0 }
+
+		for (id, image) in reduced {
+			storedImages[id] = image
+			// Both caches are keyed by ID, and `reduceFileSize` is the one
+			// path that replaces bytes under an ID that already has an
+			// entry. Leaving either stale would make a view keep rendering
+			// the pre-reduction image (`decoded`), or keep refusing to
+			// render an image that decodes just fine now (`decodeFailures`).
+			decoded[id] = nil
+			decodeFailures.remove(id)
+		}
+		didChange?()
+		return before - totalByteCount
+	}
+
+	/// The CPU-heavy half of `reduceFileSize()`, isolated to nothing so it
+	/// runs off the main actor. Returns only the entries that actually got
+	/// smaller; the caller applies those back to `storedImages`.
+	nonisolated private static func reduced(from images: [UUID: StoredImage]) async throws -> [UUID: StoredImage] {
+		var result: [UUID: StoredImage] = [:]
+		for (id, image) in images {
+			let prepared = try ImageCoder.prepared(image.data, quality: .standard)
+			guard prepared.data.count < image.data.count else { continue }
+			result[id] = StoredImage(data: prepared.data,
+									 contentType: prepared.contentType,
+									 pixelWidth: prepared.pixelWidth,
+									 pixelHeight: prepared.pixelHeight)
+		}
+		return result
+	}
+
 	func metadata(for ids: Set<UUID>) -> [StoredImageMeta] {
 		ids.compactMap { id in
 			guard let stored = storedImages[id] else { return nil }

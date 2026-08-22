@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03394FE2DB51F8E4DE401653 /* ImageQualitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F571058BBA26D58D845B14CD /* ImageQualitySettings.swift */; };
 		1290254C5EB69255FD232DCC /* ImageCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9275C19F2D9AF47998246CB6 /* ImageCoder.swift */; };
 		1DBB3B58C0A2FAE8529F8F2B /* MozaicUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */; };
 		24B6042EE6CA41313DFA86F5 /* ImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A3D430387C325D368C32D8 /* ImageStore.swift */; };
@@ -29,6 +30,7 @@
 		BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */; };
 		C42603667FCBE9E1CACF4026 /* MozaicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1026FFECF9D0447E26238E /* MozaicUITests.swift */; };
 		CAF6C10B92932B45A948BFB3 /* UndoableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491DA828673FBF85BEA79E96 /* UndoableTextField.swift */; };
+		CD1DBA018BD12BCB80F3BC98 /* ReduceFileSizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D34C916C9822270906DA3B2 /* ReduceFileSizeTests.swift */; };
 		D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */; };
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
 		D86BB6A72BF67EF10054AC82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6A62BF67EF10054AC82 /* Assets.xcassets */; };
@@ -63,6 +65,7 @@
 		33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UTType+Mozaic.swift"; path = "Document/UTType+Mozaic.swift"; sourceTree = "<group>"; };
 		35646706C2262B55828E7FAD /* MozaicDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocument.swift; path = Document/MozaicDocument.swift; sourceTree = "<group>"; };
 		491DA828673FBF85BEA79E96 /* UndoableTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UndoableTextField.swift; path = Mozaic/inspector/UndoableTextField.swift; sourceTree = "<group>"; };
+		4D34C916C9822270906DA3B2 /* ReduceFileSizeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReduceFileSizeTests.swift; path = MozaicTests/ReduceFileSizeTests.swift; sourceTree = "<group>"; };
 		4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocumentTests.swift; path = MozaicTests/MozaicDocumentTests.swift; sourceTree = "<group>"; };
 		54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifestTests.swift; path = MozaicTests/BoardManifestTests.swift; sourceTree = "<group>"; };
 		64A3D430387C325D368C32D8 /* ImageStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageStore.swift; path = Document/ImageStore.swift; sourceTree = "<group>"; };
@@ -92,6 +95,7 @@
 		D86BB6BA2BF67EF10054AC82 /* MozaicUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MozaicUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA1026FFECF9D0447E26238E /* MozaicUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITests.swift; path = MozaicUITests/MozaicUITests.swift; sourceTree = "<group>"; };
 		EA8A5C4E33E22CCDDAB4ADBC /* BoardMirror.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardMirror.swift; path = Document/BoardMirror.swift; sourceTree = "<group>"; };
+		F571058BBA26D58D845B14CD /* ImageQualitySettings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageQualitySettings.swift; path = Mozaic/inspector/ImageQualitySettings.swift; sourceTree = "<group>"; };
 		F93CB2872ECADA3213233153 /* DroppedImageTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DroppedImageTests.swift; path = MozaicTests/DroppedImageTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -131,6 +135,7 @@
 				D4631F8AE6697824315DF118 /* ProjectModelTests.swift */,
 				F93CB2872ECADA3213233153 /* DroppedImageTests.swift */,
 				0B4217777C020BEAC731A7AE /* UndoTests.swift */,
+				4D34C916C9822270906DA3B2 /* ReduceFileSizeTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -178,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				491DA828673FBF85BEA79E96 /* UndoableTextField.swift */,
+				F571058BBA26D58D845B14CD /* ImageQualitySettings.swift */,
 			);
 			name = inspector;
 			sourceTree = "<group>";
@@ -390,6 +396,7 @@
 				66D698E5FEB471C9CFB8B524 /* DroppedImage.swift in Sources */,
 				DB6C9A824A59B23ED973BF8A /* BoardMirror.swift in Sources */,
 				CAF6C10B92932B45A948BFB3 /* UndoableTextField.swift in Sources */,
+				03394FE2DB51F8E4DE401653 /* ImageQualitySettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +412,7 @@
 				F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */,
 				94328EBAAD3BD2A3C7D3234F /* DroppedImageTests.swift in Sources */,
 				FE83BCB60A4332D467396751 /* UndoTests.swift in Sources */,
+				CD1DBA018BD12BCB80F3BC98 /* ReduceFileSizeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

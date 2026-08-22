@@ -21,6 +21,24 @@ import UniformTypeIdentifiers
 		return out as Data
 	}
 
+	/// Large enough that `ImageCoder.prepared(_:quality:.standard)` actually
+	/// downscales it, unlike the tiny fixtures the other tests use.
+	private func largeJPEGData() throws -> Data {
+		let cs = CGColorSpaceCreateDeviceRGB()
+		let ctx = CGContext(data: nil, width: 2400, height: 1600, bitsPerComponent: 8,
+							bytesPerRow: 0, space: cs,
+							bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+		for i in 0..<40 {
+			ctx.setFillColor(CGColor(red: Double(i) / 40.0, green: 0.4, blue: 0.7, alpha: 1))
+			ctx.fill(CGRect(x: i * 60, y: 0, width: 60, height: 1600))
+		}
+		let out = NSMutableData()
+		let dest = CGImageDestinationCreateWithData(out, UTType.jpeg.identifier as CFString, 1, nil)!
+		CGImageDestinationAddImage(dest, ctx.makeImage()!, nil)
+		#expect(CGImageDestinationFinalize(dest))
+		return out as Data
+	}
+
 	private func snapshotWithOnePlacedImage() throws -> (BoardSnapshot, UUID) {
 		let id = UUID()
 		let stored = StoredImage(data: try makeImageData(), contentType: .png,
@@ -93,6 +111,43 @@ import UniformTypeIdentifiers
 
 		// Same wrapper instance: the bytes were not rewritten.
 		#expect(reusedChild === originalChild)
+	}
+
+	/// `ImageStore.reduceFileSize()` deliberately breaks the "same ID, same
+	/// bytes" invariant `makeFileWrapper`'s reuse check otherwise relies on:
+	/// it replaces bytes under the ID it started with, same filename and
+	/// all. If reuse only compared filenames, a save right after reducing
+	/// would silently keep serving the OLD, pre-reduction bytes from the
+	/// existing package instead of writing the new, smaller ones -- the
+	/// document size shown in the inspector would drop while the file on
+	/// disk stayed the same size. The dimension check added to
+	/// `makeFileWrapper` must catch this: reduction always changes pixel
+	/// dimensions on every ID it actually touches, so it must never reuse
+	/// the stale wrapper.
+	@Test func reducedImagesAreRewrittenNotReusedFromTheExistingPackage() async throws {
+		let id = UUID()
+		let original = try largeJPEGData()
+		var board = Board()
+		board.rows[0].slots[0] = id
+		let snapshot = BoardSnapshot(board: board, images: [id: StoredImage(data: original, contentType: .jpeg,
+																			pixelWidth: 2400, pixelHeight: 1600)])
+
+		let first = try MozaicDocument.makeFileWrapper(snapshot: snapshot, existing: nil)
+		let firstChild = try #require(first.fileWrappers?["images"]?.fileWrappers?["\(id.uuidString).jpeg"])
+
+		let store = ImageStore(storedImages: snapshot.images)
+		let saved = try await store.reduceFileSize()
+		#expect(saved > 0)
+		let reducedStored = try #require(store.stored(for: id))
+		#expect(reducedStored.data.count < original.count)   // sanity: reduction really happened
+
+		let reducedSnapshot = BoardSnapshot(board: board, images: store.storedImages)
+		let second = try MozaicDocument.makeFileWrapper(snapshot: reducedSnapshot, existing: first)
+		let secondChild = try #require(second.fileWrappers?["images"]?.fileWrappers?["\(id.uuidString).jpeg"])
+
+		#expect(secondChild !== firstChild)   // not reused: the wrapper was actually rebuilt
+		#expect(try #require(secondChild.regularFileContents) == reducedStored.data)
+		#expect(try #require(secondChild.regularFileContents) != original)
 	}
 
 	@Test func rejectsANewerFormatVersion() throws {

@@ -105,6 +105,7 @@ final class MozaicDocument: ReferenceFileDocument {
 											existing: FileWrapper?) throws -> FileWrapper {
 		let referenced = snapshot.board.referencedImageIDs
 		let existingImages = existing?.fileWrappers?[imagesDirectoryName]?.fileWrappers ?? [:]
+		let existingMeta = previousImageMeta(in: existing)
 
 		var imageChildren: [String: FileWrapper] = [:]
 		var metadata: [StoredImageMeta] = []
@@ -114,10 +115,21 @@ final class MozaicDocument: ReferenceFileDocument {
 			let ext = stored.contentType.preferredFilenameExtension ?? "dat"
 			let name = "\(id.uuidString).\(ext)"
 
-			// Image bytes are immutable per ID — any edit mints a new ID — so
-			// a matching filename guarantees matching contents. That makes
-			// reuse safe and keeps saves from rewriting unchanged images.
-			if let reusable = existingImages[name], reusable.isRegularFile {
+			// Image bytes are immutable per ID under ordinary edits — any edit
+			// mints a new ID — so a matching filename ordinarily guarantees
+			// matching contents, and that's what makes reuse safe and keeps
+			// saves from rewriting unchanged images. "Reduce File Size" is
+			// the one deliberate exception: it replaces bytes under an
+			// existing ID, and it always shrinks the pixel dimensions when it
+			// does (see `ImageStore.reduceFileSize()`). So reuse also
+			// requires this ID's dimensions to match what the previous save
+			// recorded for it. That check reads the small manifest.json
+			// already sitting in `existing`, never the image bytes
+			// themselves, so an unrelated unchanged image is still never
+			// read back off disk just to confirm it is unchanged.
+			let dimensionsMatchPreviousSave = existingMeta[id]?.pixelWidth == stored.pixelWidth
+				&& existingMeta[id]?.pixelHeight == stored.pixelHeight
+			if dimensionsMatchPreviousSave, let reusable = existingImages[name], reusable.isRegularFile {
 				imageChildren[name] = reusable
 			} else {
 				imageChildren[name] = FileWrapper(regularFileWithContents: stored.data)
@@ -137,6 +149,22 @@ final class MozaicDocument: ReferenceFileDocument {
 			manifestName: FileWrapper(regularFileWithContents: manifest),
 			imagesDirectoryName: FileWrapper(directoryWithFileWrappers: imageChildren),
 		])
+	}
+
+	/// Decodes the previous save's manifest, if any, keyed by image ID.
+	///
+	/// Used only to detect whether a same-ID, same-filename image had its
+	/// bytes replaced in place since the last save — see the dimension check
+	/// in `makeFileWrapper` above. Never used to read image bytes. A missing
+	/// or unparsable manifest (the first save, or a hand-edited package)
+	/// yields an empty dictionary, which makes every reuse check fail closed:
+	/// everything gets rewritten rather than risking a stale reuse.
+	nonisolated private static func previousImageMeta(in existing: FileWrapper?) -> [UUID: StoredImageMeta] {
+		guard let data = existing?.fileWrappers?[manifestName]?.regularFileContents,
+			  let file = try? JSONDecoder().decode(BoardFile.self, from: data) else {
+			return [:]
+		}
+		return Dictionary(uniqueKeysWithValues: file.images.map { ($0.id, $0) })
 	}
 
 	// MARK: Reading

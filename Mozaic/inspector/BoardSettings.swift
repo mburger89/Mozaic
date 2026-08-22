@@ -58,6 +58,8 @@ struct BoardSettings: View {
 				UndoableTextField(pm: pm, titleKey: "Created By", name: "Change Created By", keyPath: \.createdBy)
 					.textFieldStyle(.roundedBorder)
 					.border(Color.gray)
+
+				ImageQualitySettings(pm: pm, qualityBinding: undoableBinding("Change Image Quality", \.quality))
 			}
 			Spacer()
 		}.padding()
