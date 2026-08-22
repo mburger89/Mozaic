@@ -64,6 +64,52 @@ import UniformTypeIdentifiers
 		#expect(model.board.tray.contains(ids.last!))            // newest kept
 	}
 
+	/// The spec caps the tray at 30 with FIFO eviction "and the user is told
+	/// when it happens". Eviction used to be silent: images simply stopped
+	/// being in the tray, with nothing said about where they went.
+	@Test func trayEvictionPostsANotice() throws {
+		let model = ProjectModel()
+		for seed in 0..<Board.trayLimit {
+			_ = try model.importImage(try imageData(seed))
+		}
+		#expect(model.notice == nil)          // nothing evicted yet, nothing to say
+
+		_ = try model.importImage(try imageData(Board.trayLimit))
+
+		let notice = try #require(model.notice)
+		#expect(notice.message.contains("\(Board.trayLimit)"))
+	}
+
+	/// Notices are session state, not document state: posting one must not
+	/// reach `Board` or the disk mirror, or every message the app shows would
+	/// dirty the document and change what gets saved.
+	@Test func postingANoticeDoesNotTouchTheBoardOrTheMirror() {
+		let model = ProjectModel()
+		let board = model.board
+
+		model.postNotice("Something happened.")
+
+		#expect(model.board == board)
+		#expect(model.mirror.snapshot.board == board)
+	}
+
+	/// `BoardNoticeView` clears a notice on a timer keyed to its identity. If
+	/// the clear were unconditional, a timer started for an old notice could
+	/// wipe a newer one that arrived while it slept.
+	@Test func clearingANoticeOnlyClearsTheOneItNames() throws {
+		let model = ProjectModel()
+		model.postNotice("First.")
+		let first = try #require(model.notice)
+		model.postNotice("Second.")
+
+		model.clearNotice(first.id)
+		#expect(model.notice?.message == "Second.")
+
+		let second = try #require(model.notice)
+		model.clearNotice(second.id)
+		#expect(model.notice == nil)
+	}
+
 	@Test func trayEvictionNeverRemovesAPlacedImage() throws {
 		let model = ProjectModel()
 		let placed = try model.importImage(try imageData(0))

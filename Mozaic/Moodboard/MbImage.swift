@@ -36,7 +36,7 @@ struct MbImage: View {
 				do {
 					accepted = try model.accept(first, row: indexes[0], slot: indexes[1])
 				} catch {
-					print("Drop rejected:", error)
+					model.postNotice("Couldn't add that image. It may be damaged or in a format Mozaic can't read.")
 					accepted = false
 				}
 			}

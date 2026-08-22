@@ -123,6 +123,105 @@ import UniformTypeIdentifiers
 	/// the pre-reduction picture even though `stored(for:)` already reflects
 	/// the smaller bytes. `decodeCountForTesting` proves a real re-decode
 	/// happened rather than a cache hit.
+	/// `ReferenceFileDocument` has no change-tracking channel other than the
+	/// `UndoManager`: SwiftUI derives `updateChangeCount` entirely from undo
+	/// registrations. Reduce File Size used to register nothing, so the
+	/// inspector showed a smaller Document Size and the mirror held the
+	/// reduced bytes while the document stayed *clean* -- close the window and
+	/// there was no unsaved-changes prompt, and the file on disk kept its
+	/// full-size images. A registered undo is therefore the dirty flag as much
+	/// as it is an undo, which is what this asserts.
+	@Test func reducingRegistersAnUndoSoTheDocumentIsDirty() async throws {
+		let pm = ProjectModel()
+		let undo = UndoManager()
+		undo.groupsByEvent = false
+		pm.undoManager = undo
+		pm.quality = .full
+		undo.removeAllActions()          // the quality change is an edit of its own
+		_ = try pm.importImage(try largeJPEG())
+		#expect(undo.canUndo == false)   // importImage alone registers nothing
+
+		let outcome = await pm.reduceImageFileSize()
+
+		#expect(outcome.bytesSaved > 0)
+		#expect(undo.canUndo)
+		#expect(undo.undoActionName == "Reduce File Size")
+	}
+
+	/// Undo has to put the *bytes* back, not just the board -- reduction never
+	/// touches `Board` at all -- and it has to put them back in the mirror
+	/// too, since that is what a save actually writes.
+	@Test func undoingAReductionRestoresTheOriginalBytesEverywhere() async throws {
+		let pm = ProjectModel()
+		let undo = UndoManager()
+		undo.groupsByEvent = false
+		pm.undoManager = undo
+		pm.quality = .full
+		let id = try pm.importImage(try largeJPEG())
+		let original = try #require(pm.images.stored(for: id))
+
+		_ = await pm.reduceImageFileSize()
+		let reducedCount = try #require(pm.images.stored(for: id)).data.count
+		#expect(reducedCount < original.data.count)
+
+		undo.undo()
+
+		#expect(pm.images.stored(for: id) == original)
+		#expect(pm.mirror.snapshot.images[id] == original)
+
+		undo.redo()
+
+		#expect(pm.images.stored(for: id)?.data.count == reducedCount)
+		#expect(pm.mirror.snapshot.images[id]?.data.count == reducedCount)
+	}
+
+	/// A run that found nothing to shrink changed nothing, so it must not
+	/// dirty the document or leave a do-nothing "Undo Reduce File Size" in the
+	/// Edit menu -- the same rule `withUndo` follows for a change that did not
+	/// alter the board.
+	@Test func reducingNothingRegistersNoUndo() async throws {
+		let pm = ProjectModel()
+		let undo = UndoManager()
+		undo.groupsByEvent = false
+		pm.undoManager = undo
+		_ = try pm.importImage(try largeJPEG())   // already downscaled on import
+		undo.removeAllActions()
+
+		let outcome = await pm.reduceImageFileSize()
+
+		#expect(outcome.bytesSaved == 0)
+		#expect(outcome.previousImages.isEmpty)
+		#expect(undo.canUndo == false)
+	}
+
+	/// Reduction without an `UndoManager` -- previews, tests, and the iOS
+	/// document path before the environment supplies one -- must still reduce.
+	@Test func reducingWorksWithoutAnUndoManager() async throws {
+		let pm = ProjectModel()
+		pm.quality = .full
+		let id = try pm.importImage(try largeJPEG())
+		let before = try #require(pm.images.stored(for: id)).data.count
+
+		_ = await pm.reduceImageFileSize()
+
+		#expect(try #require(pm.images.stored(for: id)).data.count < before)
+	}
+
+	/// `replaceImages` is the undo half of the one command that replaces bytes
+	/// under an existing ID. It must never *insert*: an ID the store has since
+	/// dropped (an image garbage-collected out of a save, say) coming back
+	/// from an undo would resurrect bytes the document no longer references.
+	@Test func replacingImagesIgnoresUnknownIDs() throws {
+		let store = ImageStore()
+		let ghost = StoredImage(data: Data("ghost".utf8), contentType: .png,
+								pixelWidth: 1, pixelHeight: 1)
+
+		let displaced = store.replaceImages([UUID(): ghost])
+
+		#expect(displaced.isEmpty)
+		#expect(store.storedImages.isEmpty)
+	}
+
 	@Test func reducingInvalidatesTheDecodedImageCache() async throws {
 		let store = ImageStore()
 		let id = try store.add(try largeJPEG(), quality: .full)

@@ -145,17 +145,106 @@ final class ProjectModel {
 	/// Imports bytes into the store and puts the image in the tray.
 	///
 	/// The tray cap bounds tray membership only — never the store — so
-	/// eviction can never remove an image that is placed on the board.
+	/// eviction can never remove an image that is placed on the board. It is
+	/// still a thing that happened to the user's tray without them asking,
+	/// so it posts a notice rather than shuffling images out silently.
 	@discardableResult
 	func importImage(_ data: Data) throws -> UUID {
 		let id = try images.add(data, quality: board.quality)
+		var evicted = 0
 		mutateBoard {
 			$0.tray.append(id)
 			if $0.tray.count > Board.trayLimit {
-				$0.tray.removeFirst($0.tray.count - Board.trayLimit)
+				evicted = $0.tray.count - Board.trayLimit
+				$0.tray.removeFirst(evicted)
 			}
 		}
+		if evicted > 0 {
+			let noun = evicted == 1 ? "image" : "images"
+			postNotice("Tray is full at \(Board.trayLimit) images, so the \(evicted) oldest \(noun) left it. Anything already placed on the board is unaffected.")
+		}
 		return id
+	}
+
+	// MARK: Notices
+
+	/// The latest thing the app needs to tell the user about — a tray
+	/// eviction, a refused drop, an image it could not read.
+	///
+	/// Session state, deliberately outside `Board`: it is never persisted,
+	/// so posting one must not reach `mutateBoard`, must not touch the disk
+	/// mirror, and must not dirty the document.
+	private(set) var notice: BoardNotice?
+
+	/// Replaces whatever the app was last saying with `message`.
+	///
+	/// Newest wins: a burst of failures (a multi-image import where several
+	/// files are unreadable) leaves the user with one line, not a pile.
+	func postNotice(_ message: String) {
+		notice = BoardNotice(message: message)
+	}
+
+	/// Clears the notice, but only if it is still the one the caller saw.
+	///
+	/// The identity check is what makes the auto-dismiss in `BoardNoticeView`
+	/// safe: a timer started for an older notice cannot wipe a newer one that
+	/// arrived while it was sleeping.
+	func clearNotice(_ id: UUID) {
+		guard notice?.id == id else { return }
+		notice = nil
+	}
+
+	// MARK: Image size
+
+	/// Reduces every stored image and registers the undo that puts the
+	/// previous bytes back.
+	///
+	/// Exists so the inspector does not call `images.reduceFileSize()`
+	/// directly, because that left the document *clean*.
+	/// `ReferenceFileDocument` has no change-tracking channel of its own:
+	/// SwiftUI derives `updateChangeCount` entirely from `UndoManager`
+	/// registrations, which is exactly why every other mutation here goes
+	/// through `withUndo`. A reduction that registered nothing showed a
+	/// smaller Document Size in the inspector and refreshed the mirror, and
+	/// then nothing asked for a save — close the window and there was no
+	/// unsaved-changes prompt and the file still held the full-size images.
+	///
+	/// Registering a real inverse rather than a token one is honest *within
+	/// the session*: the pre-reduction bytes are still in memory, held alive
+	/// by the undo stack, so undo genuinely puts them back and the next save
+	/// writes them out again. What cannot be recovered is a reduction that
+	/// has been saved and the document closed — the undo stack goes then, and
+	/// with it the last copy of the discarded detail. The confirmation copy
+	/// in `ImageQualitySettings` says that, and no longer claims the command
+	/// cannot be undone at all.
+	@discardableResult
+	func reduceImageFileSize() async -> ReductionOutcome {
+		let outcome = await images.reduceFileSize()
+		registerImageRestore(outcome.previousImages)
+		return outcome
+	}
+
+	/// Registers an undo that puts `previous` back under the IDs it came
+	/// from, re-registering itself with the bytes it displaces so redo works
+	/// in the same way.
+	///
+	/// Nothing is registered when `previous` is empty — a run that found
+	/// everything already within the cap changed nothing, so it must neither
+	/// dirty the document nor grow a do-nothing "Undo" entry, matching what
+	/// `withUndo` does for a change that did not alter the board.
+	///
+	/// The undo grouping bracket is here for the same reason as in
+	/// `withUndo`: this runs from a `Task`, well outside any AppKit event,
+	/// so there is no automatic per-event group to register into.
+	private func registerImageRestore(_ previous: [UUID: StoredImage]) {
+		guard let undoManager, !previous.isEmpty else { return }
+
+		undoManager.beginUndoGrouping()
+		undoManager.setActionName("Reduce File Size")
+		undoManager.registerUndo(withTarget: self) { model in
+			model.registerImageRestore(model.images.replaceImages(previous))
+		}
+		undoManager.endUndoGrouping()
 	}
 
 	// MARK: Undo

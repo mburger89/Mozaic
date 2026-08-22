@@ -196,13 +196,25 @@ final class MozaicDocument: ReferenceFileDocument {
 			throw CocoaError(.fileReadCorruptFile)
 		}
 
+		// Match image files by the UUID in their name, never by rebuilding the
+		// name from the manifest's UTI. `preferredFilenameExtension` is
+		// whatever the running system says today: if the writer's answer for a
+		// UTI ever differs from the reader's -- a different OS version, a
+		// changed system declaration -- reconstructing the name here would
+		// fail to find a file that is sitting right there. The image would
+		// drop out of the store while its ID stayed in `rows`/`tray`, and the
+		// next save, which only writes what the store has, would delete the
+		// bytes for good. The UUID prefix is written by us and cannot drift.
 		let imageFiles = children[imagesDirectoryName]?.fileWrappers ?? [:]
+		let filesByImageID = Dictionary(
+			imageFiles.map { (String($0.key.prefix { $0 != "." }).uppercased(), $0.value) },
+			uniquingKeysWith: { first, _ in first }
+		)
 		var images: [UUID: StoredImage] = [:]
 
 		for meta in file.images {
 			guard let type = UTType(meta.contentType) else { continue }
-			let ext = type.preferredFilenameExtension ?? "dat"
-			guard let data = imageFiles["\(meta.id.uuidString).\(ext)"]?.regularFileContents else {
+			guard let data = filesByImageID[meta.id.uuidString.uppercased()]?.regularFileContents else {
 				continue  // absent or unreadable: slot renders a placeholder
 			}
 			images[meta.id] = StoredImage(data: data,

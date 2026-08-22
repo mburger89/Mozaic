@@ -40,11 +40,15 @@ struct ImageQualitySettings: View {
 			titleVisibility: .visible
 		) {
 			Button("Reduce", role: .destructive) {
-				Task { lastReduction = await pm.images.reduceFileSize() }
+				// Goes through the model, not `pm.images`, so the reduction
+				// registers an undo -- which is also the only thing that
+				// marks the document as needing a save. See
+				// `ProjectModel.reduceImageFileSize()`.
+				Task { lastReduction = await pm.reduceImageFileSize() }
 			}
 			Button("Cancel", role: .cancel) { }
 		} message: {
-			Text("Discarded detail cannot be recovered, and this cannot be undone.")
+			Text("Undo puts the original images back while this document stays open. Once it is saved and closed, the discarded detail is gone.")
 		}
 		if let lastReduction {
 			Text(reductionSummary(lastReduction))

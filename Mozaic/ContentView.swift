@@ -9,10 +9,15 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 
-struct MoodBoardImage: Transferable, FileDocument {
+/// Already-rendered PNG bytes, wrapped for `fileExporter`.
+///
+/// Export needs a concrete `FileDocument`, so unlike `BoardShareItem` this
+/// does hold the pixels — but it is now built in the Export button's action
+/// rather than during `body`, so the render runs once per export instead of
+/// twice per view update.
+struct MoodBoardImage: FileDocument {
     let data: Data
     static var readableContentTypes: [UTType] { [.png] }
-    // MARK: FileDocument conformance
     init(data: Data) {
         self.data = data
     }
@@ -21,12 +26,6 @@ struct MoodBoardImage: Transferable, FileDocument {
     }
     func fileWrapper(configuration: FileDocumentWriteConfiguration) throws -> FileWrapper {
         return FileWrapper(regularFileWithContents: data)
-    }
-    // MARK: Transferable conformance
-    static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(exportedContentType: .png) { image in
-            image.data
-        }
     }
 }
 
@@ -37,6 +36,9 @@ struct ContentView: View {
 	@State private var showSettings: Bool = false
 	@State private var importing: Bool = false
 	@State private var fileexporting: Bool = false
+	/// Rendered by the Export button, not by `body`. Nil until the user asks
+	/// for an export.
+	@State private var exportImage: MoodBoardImage?
 	@Environment(\.undoManager) private var undoManager
 	var body: some View {
 		NavigationSplitView {
@@ -49,6 +51,9 @@ struct ContentView: View {
 					.environment(pm)
 					.containerRelativeFrame(.horizontal)
 			}
+				.overlay(alignment: .bottom) {
+					BoardNoticeView(pm: pm)
+				}
 				.toolbar {
 					ToolbarItemGroup(placement: .primaryAction) {
 						Button("Import Image", systemImage: "square.and.arrow.down") {
@@ -61,7 +66,7 @@ struct ContentView: View {
 							switch result {
 								case .success(let file):
 									guard file.startAccessingSecurityScopedResource() else {
-										print("Failed to access security-scoped resource for \(file)")
+										pm.postNotice("Couldn't open \(file.lastPathComponent): Mozaic wasn't granted access to it.")
 										return
 									}
 									defer { file.stopAccessingSecurityScopedResource() }
@@ -79,10 +84,10 @@ struct ContentView: View {
 											throw importError
 										}
 									} catch {
-										print("Failed to import image:", error)
+										pm.postNotice("Couldn't import \(file.lastPathComponent). It may be damaged or in a format Mozaic can't read.")
 									}
 								case .failure(let error):
-									print(error.localizedDescription)
+									pm.postNotice("Import failed: \(error.localizedDescription)")
 							}
 						}
 						PhotosPicker(
@@ -93,43 +98,60 @@ struct ContentView: View {
 						.onChange(of: selectedItems) {
 							Task {
 								for item in selectedItems {
-									guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
-									var importError: Error?
-									pm.withUndo("Import Image") { model in
-										do {
-											try model.importImage(data)
-										} catch {
-											importError = error
+									do {
+										guard let data = try await item.loadTransferable(type: Data.self) else {
+											pm.postNotice("Couldn't read one of the selected photos.")
+											continue
 										}
-									}
-									if let importError {
-										print("Failed to import image:", importError)
+										var importError: Error?
+										pm.withUndo("Import Image") { model in
+											do {
+												try model.importImage(data)
+											} catch {
+												importError = error
+											}
+										}
+										if let importError {
+											throw importError
+										}
+									} catch {
+										pm.postNotice("Couldn't import one of the selected photos. It may be damaged or in a format Mozaic can't read.")
 									}
 								}
 							}
 						}
 						//				MARK: Render out Mood Board
 						Button("Export Board", systemImage: "arrow.down.document.fill") {
+							// Rendering here, rather than in `documents:`, is
+							// the whole point: `body` runs on every edit, and
+							// this is a full ImageRenderer pass over the board.
+							guard let data = BoardRenderer.pngData(for: pm) else {
+								pm.postNotice("Couldn't render the board for export.")
+								return
+							}
+							exportImage = MoodBoardImage(data: data)
 							fileexporting = true
 						}
 						.fileExporter(
 							isPresented: $fileexporting,
-							documents: [renderMoodBoard()],
+							document: exportImage,
 							contentType: .png,
+							defaultFilename: pm.projectName,
 							onCompletion: { result in
 								switch result {
 									case .success(let url):
 										print("Saved to \(url)")
 									case .failure(let error):
-										print(error.localizedDescription)
+										pm.postNotice("Export failed: \(error.localizedDescription)")
 									}
 								fileexporting = false
+								exportImage = nil
 							}
 						)
-						
+
 						ShareLink(
-							items: [renderMoodBoard()],
-							preview: {_ in SharePreview("MoodBoard", image: Image("mozaic"))},
+							item: BoardShareItem(model: pm),
+							preview: SharePreview("MoodBoard", image: Image("mozaic")),
 							label: {Label("Share Board", systemImage: "square.and.arrow.up")}
 						)
 						Button("Toggle Inspector", systemImage: "sidebar.right") {
@@ -155,33 +177,8 @@ struct ContentView: View {
 			pm.undoManager = undoManager
 		}
 	}
-	
-#if os(macOS)
-	func renderMoodBoard() -> MoodBoardImage {
-		let renderer = ImageRenderer(content: MoodBoardMain().environment(pm))
-		if let cgImage = renderer.cgImage {
-			let nImage = NSImage(cgImage: cgImage, size: .zero)
-			if let tiffData = nImage.tiffRepresentation,
-			   let bitmap = NSBitmapImageRep(data: tiffData),
-			   let pngData = bitmap.representation(using: .png, properties: [:]) {
-				return MoodBoardImage(data: pngData)
-			}
-		}
-		return MoodBoardImage(data: Data())
-	}
-#endif // os(macOS)
-#if os(iOS)
-	func renderMoodBoard() -> MoodBoardImage {
-		let renderer = ImageRenderer(content: MoodBoardMain().environment(pm))
-		if let uiImage = renderer.uiImage, let pngData = uiImage.pngData() {
-			return MoodBoardImage(data: pngData)
-		}
-		return MoodBoardImage(data: Data())
-	}
-#endif // os(iOS)
 }
 
 #Preview {
 	ContentView(document: MozaicDocument())
 }
-

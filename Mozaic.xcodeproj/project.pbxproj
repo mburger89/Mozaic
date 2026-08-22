@@ -11,9 +11,11 @@
 		1290254C5EB69255FD232DCC /* ImageCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9275C19F2D9AF47998246CB6 /* ImageCoder.swift */; };
 		1DBB3B58C0A2FAE8529F8F2B /* MozaicUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */; };
 		24B6042EE6CA41313DFA86F5 /* ImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A3D430387C325D368C32D8 /* ImageStore.swift */; };
+		286DBCBB6238BADF52033008 /* BoardRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA012D0133AA61FF6458B383 /* BoardRenderer.swift */; };
 		523BFFF17FB002588602C004 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668A003C8F24B216C56DD155 /* SmokeTests.swift */; };
 		59B4EFBDFE35847FFE9B297D /* ImageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D3413A8BBFA945886D0AEC /* ImageStoreTests.swift */; };
 		59BE0FEFD0DADB0840F1C5EE /* MozaicDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35646706C2262B55828E7FAD /* MozaicDocument.swift */; };
+		65476A1FFFA4607343D9DA88 /* BoardExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A768A3F019ED109C621E2E /* BoardExportTests.swift */; };
 		66D698E5FEB471C9CFB8B524 /* DroppedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6975C5A89126EF6DD42A7CAA /* DroppedImage.swift */; };
 		73383CC02CFA9197007150D7 /* Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB52CFA9197007150D7 /* Modules.swift */; };
 		73383CC22CFA9197007150D7 /* ProjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73383CB22CFA9197007150D7 /* ProjectModel.swift */; };
@@ -26,7 +28,9 @@
 		73E9A6D62E9076BB0083CF99 /* ModWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */; };
 		8DD297B9ED0E3A564FC99B7F /* BoardManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35860FD3503293935E5EF01 /* BoardManifest.swift */; };
 		94328EBAAD3BD2A3C7D3234F /* DroppedImageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93CB2872ECADA3213233153 /* DroppedImageTests.swift */; };
+		9A1EF13A851A6A655B45A56C /* BoardShareItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2A65ACBD07A015F4D35752 /* BoardShareItem.swift */; };
 		B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */; };
+		BCB3068141EAC85495FB0B41 /* BoardNoticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2C094C739E93F3BDF3D024 /* BoardNoticeView.swift */; };
 		BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */; };
 		C42603667FCBE9E1CACF4026 /* MozaicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1026FFECF9D0447E26238E /* MozaicUITests.swift */; };
 		CAF6C10B92932B45A948BFB3 /* UndoableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491DA828673FBF85BEA79E96 /* UndoableTextField.swift */; };
@@ -37,6 +41,7 @@
 		D86BB6AB2BF67EF10054AC82 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6AA2BF67EF10054AC82 /* Preview Assets.xcassets */; };
 		DAA36D6AF24E988192102B80 /* UTType+Mozaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */; };
 		DB6C9A824A59B23ED973BF8A /* BoardMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8A5C4E33E22CCDDAB4ADBC /* BoardMirror.swift */; };
+		E549BE346C03799678DA4E05 /* BoardNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA519E015A4B41EAD2A9F76 /* BoardNotice.swift */; };
 		F367E9813C597B4EF3A96CBD /* ProjectModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4631F8AE6697824315DF118 /* ProjectModelTests.swift */; };
 		FAE4EBB83579DB0E9260B320 /* ImageCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6A6429C384F741DB44215D /* ImageCoderTests.swift */; };
 		FE83BCB60A4332D467396751 /* UndoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4217777C020BEAC731A7AE /* UndoTests.swift */; };
@@ -64,6 +69,8 @@
 		0B4217777C020BEAC731A7AE /* UndoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UndoTests.swift; path = MozaicTests/UndoTests.swift; sourceTree = "<group>"; };
 		33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UTType+Mozaic.swift"; path = "Document/UTType+Mozaic.swift"; sourceTree = "<group>"; };
 		35646706C2262B55828E7FAD /* MozaicDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocument.swift; path = Document/MozaicDocument.swift; sourceTree = "<group>"; };
+		37A768A3F019ED109C621E2E /* BoardExportTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardExportTests.swift; path = MozaicTests/BoardExportTests.swift; sourceTree = "<group>"; };
+		3EA519E015A4B41EAD2A9F76 /* BoardNotice.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoardNotice.swift; sourceTree = "<group>"; };
 		491DA828673FBF85BEA79E96 /* UndoableTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UndoableTextField.swift; path = Mozaic/inspector/UndoableTextField.swift; sourceTree = "<group>"; };
 		4D34C916C9822270906DA3B2 /* ReduceFileSizeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReduceFileSizeTests.swift; path = MozaicTests/ReduceFileSizeTests.swift; sourceTree = "<group>"; };
 		4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocumentTests.swift; path = MozaicTests/MozaicDocumentTests.swift; sourceTree = "<group>"; };
@@ -81,9 +88,11 @@
 		73E9A6D22E9075B20083CF99 /* Bottominfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bottominfo.swift; sourceTree = "<group>"; };
 		73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModWrapper.swift; sourceTree = "<group>"; };
 		7A6A6429C384F741DB44215D /* ImageCoderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCoderTests.swift; path = MozaicTests/ImageCoderTests.swift; sourceTree = "<group>"; };
+		8E2A65ACBD07A015F4D35752 /* BoardShareItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoardShareItem.swift; sourceTree = "<group>"; };
 		9275C19F2D9AF47998246CB6 /* ImageCoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCoder.swift; path = Document/ImageCoder.swift; sourceTree = "<group>"; };
 		C35860FD3503293935E5EF01 /* BoardManifest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifest.swift; path = Document/BoardManifest.swift; sourceTree = "<group>"; };
 		C49A5C3B4360F4A1001E4E9D /* MozaicUITestsLaunchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITestsLaunchTests.swift; path = MozaicUITests/MozaicUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		CF2C094C739E93F3BDF3D024 /* BoardNoticeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoardNoticeView.swift; sourceTree = "<group>"; };
 		D4631F8AE6697824315DF118 /* ProjectModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProjectModelTests.swift; path = MozaicTests/ProjectModelTests.swift; sourceTree = "<group>"; };
 		D86BB69D2BF67EF00054AC82 /* Mozaic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mozaic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MozaicApp.swift; sourceTree = "<group>"; };
@@ -94,6 +103,7 @@
 		D86BB6B02BF67EF10054AC82 /* MozaicTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MozaicTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BB6BA2BF67EF10054AC82 /* MozaicUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MozaicUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA1026FFECF9D0447E26238E /* MozaicUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicUITests.swift; path = MozaicUITests/MozaicUITests.swift; sourceTree = "<group>"; };
+		EA012D0133AA61FF6458B383 /* BoardRenderer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BoardRenderer.swift; sourceTree = "<group>"; };
 		EA8A5C4E33E22CCDDAB4ADBC /* BoardMirror.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardMirror.swift; path = Document/BoardMirror.swift; sourceTree = "<group>"; };
 		F571058BBA26D58D845B14CD /* ImageQualitySettings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageQualitySettings.swift; path = Mozaic/inspector/ImageQualitySettings.swift; sourceTree = "<group>"; };
 		F93CB2872ECADA3213233153 /* DroppedImageTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DroppedImageTests.swift; path = MozaicTests/DroppedImageTests.swift; sourceTree = "<group>"; };
@@ -136,6 +146,7 @@
 				F93CB2872ECADA3213233153 /* DroppedImageTests.swift */,
 				0B4217777C020BEAC731A7AE /* UndoTests.swift */,
 				4D34C916C9822270906DA3B2 /* ReduceFileSizeTests.swift */,
+				37A768A3F019ED109C621E2E /* BoardExportTests.swift */,
 			);
 			name = MozaicTests;
 			sourceTree = "<group>";
@@ -153,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				73383CB22CFA9197007150D7 /* ProjectModel.swift */,
+				3EA519E015A4B41EAD2A9F76 /* BoardNotice.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -166,6 +178,9 @@
 				73E9A6D22E9075B20083CF99 /* Bottominfo.swift */,
 				73E9A6D52E9076BB0083CF99 /* ModWrapper.swift */,
 				6975C5A89126EF6DD42A7CAA /* DroppedImage.swift */,
+				EA012D0133AA61FF6458B383 /* BoardRenderer.swift */,
+				8E2A65ACBD07A015F4D35752 /* BoardShareItem.swift */,
+				CF2C094C739E93F3BDF3D024 /* BoardNoticeView.swift */,
 			);
 			path = Moodboard;
 			sourceTree = "<group>";
@@ -397,6 +412,10 @@
 				DB6C9A824A59B23ED973BF8A /* BoardMirror.swift in Sources */,
 				CAF6C10B92932B45A948BFB3 /* UndoableTextField.swift in Sources */,
 				03394FE2DB51F8E4DE401653 /* ImageQualitySettings.swift in Sources */,
+				E549BE346C03799678DA4E05 /* BoardNotice.swift in Sources */,
+				286DBCBB6238BADF52033008 /* BoardRenderer.swift in Sources */,
+				9A1EF13A851A6A655B45A56C /* BoardShareItem.swift in Sources */,
+				BCB3068141EAC85495FB0B41 /* BoardNoticeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +432,7 @@
 				94328EBAAD3BD2A3C7D3234F /* DroppedImageTests.swift in Sources */,
 				FE83BCB60A4332D467396751 /* UndoTests.swift in Sources */,
 				CD1DBA018BD12BCB80F3BC98 /* ReduceFileSizeTests.swift in Sources */,
+				65476A1FFFA4607343D9DA88 /* BoardExportTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

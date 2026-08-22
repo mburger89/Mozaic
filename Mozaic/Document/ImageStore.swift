@@ -12,7 +12,7 @@ import UIKit
 ///
 /// Bytes are immutable once stored under an ID: any edit produces a new ID.
 /// `MozaicDocument`'s incremental save relies on this.
-struct StoredImage: Sendable {
+struct StoredImage: Sendable, Equatable {
 	var data: Data
 	var contentType: UTType
 	var pixelWidth: Int
@@ -30,6 +30,15 @@ struct ReductionOutcome: Sendable, Equatable {
 	/// tolerates them at open time. Not an error: the rest of the run still
 	/// completed.
 	var failedCount: Int
+	/// The pre-reduction bytes of every image that was actually reduced,
+	/// keyed by ID. Empty when nothing changed.
+	///
+	/// This is what `ProjectModel.reduceImageFileSize()` hands to
+	/// `UndoManager` as the inverse of the reduction -- which is also the
+	/// only reason the document gets marked dirty at all, since SwiftUI
+	/// derives a `ReferenceFileDocument`'s change count entirely from undo
+	/// registrations.
+	var previousImages: [UUID: StoredImage] = [:]
 }
 
 /// Owns every image in a document and hands views decoded `Image` values.
@@ -172,8 +181,12 @@ final class ImageStore {
 	/// format. Images already within the cap, and formats that cannot round
 	/// trip, are left byte-identical.
 	///
-	/// Destructive and deliberately not undoable: the discarded detail is
-	/// gone, so registering an inverse would be a lie.
+	/// Destructive, but undoable for as long as the document stays open:
+	/// the pre-reduction bytes come back in `ReductionOutcome.previousImages`
+	/// and `ProjectModel.reduceImageFileSize()` registers them as the
+	/// inverse. What genuinely cannot be recovered is a reduction that has
+	/// been saved and the document closed, since the undo stack (and with it
+	/// the only remaining copy of the discarded detail) goes at that point.
 	///
 	/// Skip-and-continue, not all-or-nothing: an image that fails
 	/// `ImageCoder.prepared` (reachable via corrupt bytes that arrived
@@ -201,7 +214,9 @@ final class ImageStore {
 			return ReductionOutcome(bytesSaved: 0, failedCount: failedCount)
 		}
 
+		var previous: [UUID: StoredImage] = [:]
 		for (id, image) in reduced {
+			if let existing = storedImages[id] { previous[id] = existing }
 			storedImages[id] = image
 			// Both caches are keyed by ID, and `reduceFileSize` is the one
 			// path that replaces bytes under an ID that already has an
@@ -212,7 +227,40 @@ final class ImageStore {
 			decodeFailures.remove(id)
 		}
 		didChange?()
-		return ReductionOutcome(bytesSaved: before - totalByteCount, failedCount: failedCount)
+		return ReductionOutcome(bytesSaved: before - totalByteCount,
+								failedCount: failedCount,
+								previousImages: previous)
+	}
+
+	/// Puts an earlier generation of bytes back under IDs that already exist,
+	/// returning the bytes it displaced so the caller can register the
+	/// opposite direction.
+	///
+	/// The one caller is `ProjectModel`'s undo/redo of "Reduce File Size",
+	/// which is also the only command that replaces bytes under an existing
+	/// ID in the first place -- see `reduceFileSize()` and the pixel-dimension
+	/// check in `MozaicDocument.makeFileWrapper`, which is what keeps a save
+	/// after either direction from reusing the previous save's file.
+	///
+	/// IDs the store does not know are skipped rather than inserted, so this
+	/// can never resurrect an image the document has since dropped.
+	@discardableResult
+	func replaceImages(_ images: [UUID: StoredImage]) -> [UUID: StoredImage] {
+		var displaced: [UUID: StoredImage] = [:]
+		for (id, image) in images {
+			guard let existing = storedImages[id] else { continue }
+			displaced[id] = existing
+			storedImages[id] = image
+			// Same reasoning as `reduceFileSize()`: both caches are keyed by
+			// ID, and this replaces bytes under an ID that already has an
+			// entry, so a stale cache would keep rendering the other
+			// generation of the image.
+			decoded[id] = nil
+			decodeFailures.remove(id)
+		}
+		guard !displaced.isEmpty else { return [:] }
+		didChange?()
+		return displaced
 	}
 
 	/// The CPU-heavy half of `reduceFileSize()`, isolated to nothing so it

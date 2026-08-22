@@ -72,6 +72,43 @@ import UniformTypeIdentifiers
 		#expect(read.images[id]?.data == snapshot.images[id]?.data)
 	}
 
+	/// `read` used to rebuild each image's filename from its manifest UTI via
+	/// `preferredFilenameExtension`, which is whatever the running system says
+	/// today. A writer and a reader that disagree about a UTI's preferred
+	/// extension -- different OS versions, a changed system declaration --
+	/// would make the reader miss a file sitting right there in `images/`. The
+	/// image would vanish from the store while its ID stayed in the board, and
+	/// the next save, which writes only what the store holds, would delete the
+	/// bytes permanently. Matching on the UUID prefix, which Mozaic itself
+	/// writes, removes the whole class of failure.
+	///
+	/// `.jpe` here stands in for any such disagreement: a legitimate
+	/// alternative extension for `public.jpeg` that is not the one this system
+	/// prefers. The bytes are never sniffed on read, so their real format is
+	/// irrelevant to what is being tested.
+	@Test func readsAnImageWhoseExtensionIsNotTheUTIsPreferredOne() throws {
+		let id = UUID()
+		let data = try makeImageData()
+		var board = Board()
+		board.rows[0].slots[0] = id
+		let meta = StoredImageMeta(id: id, contentType: UTType.jpeg.identifier,
+								   pixelWidth: 20, pixelHeight: 20)
+		let manifest = try JSONEncoder().encode(BoardFile(board: board, images: [meta]))
+		#expect(UTType.jpeg.preferredFilenameExtension != "jpe")
+
+		let wrapper = FileWrapper(directoryWithFileWrappers: [
+			"manifest.json": FileWrapper(regularFileWithContents: manifest),
+			"images": FileWrapper(directoryWithFileWrappers: [
+				"\(id.uuidString).jpe": FileWrapper(regularFileWithContents: data),
+			]),
+		])
+
+		let read = try MozaicDocument.read(wrapper)
+
+		#expect(read.images[id]?.data == data)
+		#expect(read.images[id]?.contentType == .jpeg)   // still believed from the manifest
+	}
+
 	@Test func unreferencedImagesAreNotWritten() throws {
 		var (snapshot, _) = try snapshotWithOnePlacedImage()
 		let orphan = UUID()
