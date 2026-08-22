@@ -23,12 +23,25 @@ struct UndoableTextField: View {
 		TextField(titleKey, text: $text)
 			.focused($isFocused)
 			.onChange(of: pm[keyPath: keyPath], initial: true) { _, newValue in
-				text = newValue
+				// Only re-seed while unfocused. While focused, `text` is the
+				// user's in-progress edit; an external change to the same
+				// property (a stray undo landing here, another view writing
+				// it) must not silently clobber what they're typing. The
+				// next focus loss re-reads the model anyway, so nothing is
+				// lost — the re-seed is just deferred, not skipped.
+				if !isFocused { text = newValue }
 			}
 			.onChange(of: isFocused) { wasFocused, nowFocused in
 				if wasFocused, !nowFocused { commit() }
 			}
 			.onSubmit { commit() }
+			// View teardown is also a commit boundary. Without this, closing
+			// the window while this field still has focus drops the
+			// in-progress edit silently — worse, since nothing ever wrote to
+			// `pm`, no undo action registers and the document never learns
+			// it's dirty, so the close-without-saving prompt might not even
+			// appear.
+			.onDisappear { commit() }
 	}
 
 	private func commit() {
@@ -53,12 +66,15 @@ struct UndoableNumberField: View {
 		TextField(titleKey, value: $value, format: .number.precision(.fractionLength(0...1)))
 			.focused($isFocused)
 			.onChange(of: pm[keyPath: keyPath], initial: true) { _, newValue in
-				value = newValue
+				// See UndoableTextField: don't clobber an in-progress edit.
+				if !isFocused { value = newValue }
 			}
 			.onChange(of: isFocused) { wasFocused, nowFocused in
 				if wasFocused, !nowFocused { commit() }
 			}
 			.onSubmit { commit() }
+			// See UndoableTextField: flush a pending edit on teardown too.
+			.onDisappear { commit() }
 	}
 
 	private func commit() {
