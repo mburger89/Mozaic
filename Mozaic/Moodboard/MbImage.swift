@@ -32,8 +32,7 @@ struct MbImage: View {
 		.dropDestination(for: DroppedImage.self) { items, _ in
 			guard let first = items.first else { return false }
 			do {
-				try pm.accept(first, row: indexes[0], slot: indexes[1])
-				return true
+				return try pm.accept(first, row: indexes[0], slot: indexes[1])
 			} catch {
 				print("Drop rejected:", error)
 				return false

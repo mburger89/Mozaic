@@ -37,8 +37,9 @@ import UniformTypeIdentifiers
 		let id = try model.importImage(try pngData())
 		let storedCount = model.images.storedImages.count
 
-		try model.accept(.reference(id), row: 1, slot: 2)
+		let accepted = try model.accept(.reference(id), row: 1, slot: 2)
 
+		#expect(accepted)
 		#expect(model.board.rows[1].slots[2] == id)
 		// An in-app drag moves an ID: no new image is created.
 		#expect(model.images.storedImages.count == storedCount)
@@ -46,25 +47,28 @@ import UniformTypeIdentifiers
 
 	@Test func acceptingAnExternalDropImportsThenPlaces() throws {
 		let model = ProjectModel()
-		try model.accept(.external(try pngData(), UTType.png.identifier), row: 0, slot: 3)
+		let accepted = try model.accept(.external(try pngData()), row: 0, slot: 3)
 
+		#expect(accepted)
 		let placed = try #require(model.board.rows[0].slots[3])
 		#expect(model.images.stored(for: placed) != nil)
 	}
 
 	@Test func acceptingAReferenceToAnUnknownImageIsIgnored() throws {
 		let model = ProjectModel()
-		try model.accept(.reference(UUID()), row: 0, slot: 0)
+		let accepted = try model.accept(.reference(UUID()), row: 0, slot: 0)
 
 		// A dangling reference must never reach the board, or the manifest
-		// would point at a file that was never written.
+		// would point at a file that was never written. SwiftUI must also be
+		// told the drop was refused, not silently accepted.
+		#expect(!accepted)
 		#expect(model.board.rows[0].slots[0] == nil)
 	}
 
 	@Test func acceptingCorruptExternalDataThrowsAndLeavesTheBoardAlone() {
 		let model = ProjectModel()
 		#expect(throws: ImageCoderError.self) {
-			try model.accept(.external(Data("nope".utf8), UTType.png.identifier), row: 0, slot: 0)
+			try model.accept(.external(Data("nope".utf8)), row: 0, slot: 0)
 		}
 		#expect(model.board.rows[0].slots[0] == nil)
 	}
