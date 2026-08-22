@@ -42,7 +42,7 @@ struct BoardSettings: View {
 			}
 			HStack{
 				Slider(value: undoableBinding("Change Grid Gap", \.gridGap), in: 0...30)
-				TextField("grid gap", value: undoableBinding("Change Grid Gap", \.gridGap), format: .number.precision(.fractionLength(0...1)))
+				UndoableNumberField(pm: pm, titleKey: "grid gap", name: "Change Grid Gap", keyPath: \.gridGap)
 					.frame(width:75)
 					.textFieldStyle(.roundedBorder)
 			}
@@ -51,11 +51,11 @@ struct BoardSettings: View {
 					Label("Board info", systemImage: "inset.filled.bottomhalf.tophalf.rectangle")
 				}
 				Text("Project Name")
-				TextField("Project Name", text: undoableBinding("Change Project Name", \.projectName))
+				UndoableTextField(pm: pm, titleKey: "Project Name", name: "Change Project Name", keyPath: \.projectName)
 					.textFieldStyle(.roundedBorder)
 					.border(Color.gray)
 				Text("Created By")
-				TextField("Created By", text: undoableBinding("Change Created By", \.createdBy))
+				UndoableTextField(pm: pm, titleKey: "Created By", name: "Change Created By", keyPath: \.createdBy)
 					.textFieldStyle(.roundedBorder)
 					.border(Color.gray)
 			}

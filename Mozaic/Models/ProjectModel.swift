@@ -162,7 +162,15 @@ final class ProjectModel {
 
 	/// Supplied by the document's environment. Nil in previews and tests that
 	/// do not exercise undo.
-	@ObservationIgnored var undoManager: UndoManager?
+	///
+	/// `weak`: `UndoManager` retains its registered targets for as long as
+	/// their actions sit on the undo/redo stack — which, for `self`, is
+	/// almost always, since every edit registers `self` as the target. A
+	/// strong reference here would close the cycle `ProjectModel →
+	/// undoManager → stack entry → ProjectModel`, keeping the model (and
+	/// with it `ImageStore` and every decoded image) alive past document
+	/// close for as long as any unpopped undo/redo action referenced it.
+	@ObservationIgnored weak var undoManager: UndoManager?
 
 	/// Runs a change and registers its inverse with `undoManager`.
 	///

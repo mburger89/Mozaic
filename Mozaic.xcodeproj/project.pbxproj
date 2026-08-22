@@ -28,6 +28,7 @@
 		B36331C01736C324A22DC65A /* MozaicDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */; };
 		BDD5416C62C458BD0FA323D1 /* BoardManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */; };
 		C42603667FCBE9E1CACF4026 /* MozaicUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1026FFECF9D0447E26238E /* MozaicUITests.swift */; };
+		CAF6C10B92932B45A948BFB3 /* UndoableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491DA828673FBF85BEA79E96 /* UndoableTextField.swift */; };
 		D86BB6A12BF67EF00054AC82 /* MozaicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A02BF67EF00054AC82 /* MozaicApp.swift */; };
 		D86BB6A32BF67EF00054AC82 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BB6A22BF67EF00054AC82 /* ContentView.swift */; };
 		D86BB6A72BF67EF10054AC82 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86BB6A62BF67EF10054AC82 /* Assets.xcassets */; };
@@ -61,6 +62,7 @@
 		0B4217777C020BEAC731A7AE /* UndoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UndoTests.swift; path = MozaicTests/UndoTests.swift; sourceTree = "<group>"; };
 		33FCAA61729E0B3485627AC1 /* UTType+Mozaic.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UTType+Mozaic.swift"; path = "Document/UTType+Mozaic.swift"; sourceTree = "<group>"; };
 		35646706C2262B55828E7FAD /* MozaicDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocument.swift; path = Document/MozaicDocument.swift; sourceTree = "<group>"; };
+		491DA828673FBF85BEA79E96 /* UndoableTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UndoableTextField.swift; path = Mozaic/inspector/UndoableTextField.swift; sourceTree = "<group>"; };
 		4EA7E895434EB007D9E31C76 /* MozaicDocumentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MozaicDocumentTests.swift; path = MozaicTests/MozaicDocumentTests.swift; sourceTree = "<group>"; };
 		54CB3A9CFB66824171391A53 /* BoardManifestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoardManifestTests.swift; path = MozaicTests/BoardManifestTests.swift; sourceTree = "<group>"; };
 		64A3D430387C325D368C32D8 /* ImageStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageStore.swift; path = Document/ImageStore.swift; sourceTree = "<group>"; };
@@ -172,6 +174,14 @@
 			path = inspector;
 			sourceTree = "<group>";
 		};
+		981BD4529542E235B2FFE403 /* inspector */ = {
+			isa = PBXGroup;
+			children = (
+				491DA828673FBF85BEA79E96 /* UndoableTextField.swift */,
+			);
+			name = inspector;
+			sourceTree = "<group>";
+		};
 		9F567172A6A7A433FAA46CA4 /* Document */ = {
 			isa = PBXGroup;
 			children = (
@@ -192,6 +202,7 @@
 				D86BB69E2BF67EF00054AC82 /* Products */,
 				1522C05C998C34AC6AF4C4D6 /* MozaicTests */,
 				1A7213B1EAE478E6C82310A7 /* MozaicUITests */,
+				981BD4529542E235B2FFE403 /* inspector */,
 			);
 			sourceTree = "<group>";
 		};
@@ -378,6 +389,7 @@
 				59BE0FEFD0DADB0840F1C5EE /* MozaicDocument.swift in Sources */,
 				66D698E5FEB471C9CFB8B524 /* DroppedImage.swift in Sources */,
 				DB6C9A824A59B23ED973BF8A /* BoardMirror.swift in Sources */,
+				CAF6C10B92932B45A948BFB3 /* UndoableTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
