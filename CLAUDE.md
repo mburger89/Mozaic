@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Mozaic is a SwiftUI moodboard app — the user drops images into fixed-layout grid "modules" and exports the whole board as a PNG. It is a document-based app (`DocumentGroup`/`ReferenceFileDocument`): each board is a `.mozaic` package on disk. Single Xcode project, no package manager, no third-party dependencies.
 
-**`AGENTS.md` in the repo root holds the mandatory Swift/SwiftUI style rules for this project. Read it before writing code.** The codebase was swept for violations of its "Never/Always" API rules and is currently clean; keep it that way. Two structural rules are *not* yet satisfied, because both need `project.pbxproj` surgery (see "Adding or renaming files" below): several files declare more than one type (`Modules.swift` has 9, `ModWrapper.swift` has 4, `ContentView.swift` has 2), and two filenames don't match the type inside (`bottomBar.swift` → `BottomBar`, `Bottominfo.swift` → `BottomInfo`).
+**`AGENTS.md` in the repo root holds the mandatory Swift/SwiftUI style rules for this project. Read it before writing code.** The codebase was swept for violations of its "Never/Always" API rules and is currently clean; keep it that way. Its structural rules hold too: every file declares exactly one top-level type, and every filename matches the type inside. Keeping that true when you add a type means a `project.pbxproj` edit — see "Adding, renaming, and removing files" below.
 
 ## Build & test
 
@@ -25,7 +25,7 @@ xcodebuild -project Mozaic.xcodeproj -scheme Mozaic \
 xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS' test
 ```
 
-**MozaicTests uses Swift Testing (`@Test`), not XCTest**, and it runs (77 test-case passes as of this writing, from 75 `@Test` functions — one is parameterized over 3 inputs). Count real passes reliably with:
+**MozaicTests uses Swift Testing (`@Test`), not XCTest**, and it runs (88 test-case passes as of this writing). Count real passes reliably with:
 
 ```sh
 xcodebuild ... test 2>&1 | grep -cE "^Test case .* passed"
@@ -90,7 +90,7 @@ Image bytes never change under a given `UUID`; any edit that changes an image mi
 ContentView  (owns document: MozaicDocument, computed `pm` = document.model)
   └ MoodBoardMain      LazyHGrid, 2 fixed rows over pm.board.rows
       └ ModuleWrapper  switches on Row.module → one of 8 layout views, built from an MbCell
-          └ Vlong2Short / FourShort / OneCell / …   (Moodboard/Modules.swift)
+          └ Vlong2Short / FourShort / OneCell / …   (Moodboard/Layouts/)
               └ MbImage   one image slot: resolves a UUID? through pm.image(for:), draggable source + dropDestination
 ```
 
@@ -98,7 +98,7 @@ ContentView  (owns document: MozaicDocument, computed `pm` = document.model)
 
 Drag and drop moves `DroppedImage` (`Moodboard/DroppedImage.swift`), not raw pixels: `.reference(UUID)` for an in-app drag between slots/tray, `.external(Data)` for a drop arriving from outside the app. `ProjectModel.accept(_:row:slot:)` resolves either case into a `place(_:row:slot:)` call, importing new bytes via `importImage` for the external case.
 
-Adding a layout means: a case in `Module` (with raw value, `assetName`, and `displayName`), a view struct in `Modules.swift`, and a case in `ModuleWrapper`'s switch. The long-press picker is driven off `Module.allCases`, so it picks up the new layout automatically — but it lays out in rows of four, so a count that isn't a multiple of four leaves a ragged last row. `Module`'s raw values are the on-disk format for `Row.module` in `manifest.json`; changing one breaks any board saved with the old value.
+Adding a layout means: a case in `Module` (with raw value, `assetName`, and `displayName`), a view struct of its own in `Moodboard/Layouts/`, and a case in `ModuleWrapper`'s switch. The long-press picker is driven off `Module.allCases`, so it picks up the new layout automatically — but it lays out in rows of four, so a count that isn't a multiple of four leaves a ragged last row. `Module`'s raw values are the on-disk format for `Row.module` in `manifest.json`; changing one breaks any board saved with the old value.
 
 ### Sizing is hard-coded and cross-cutting
 
@@ -113,9 +113,9 @@ Cell geometry is split between `ProjectModel.baseCellWidth` (155.0, feeding the 
 ### Image in / image out
 
 - **In:** `fileImporter` and `PhotosPicker`, both routed through `ProjectModel.importImage(_:)`, which calls `ImageStore.add(_:quality:)` (running `ImageCoder.prepared` under the document's current `Quality` setting) and appends the resulting UUID to `board.tray`, evicting the oldest tray entries past `Board.trayLimit` (30) — eviction only ever removes from the tray array, never from `ImageStore`, so it can never delete an image that's actually placed on the board. Drag-and-drop from outside the app goes through the same `importImage` via `ProjectModel.accept(_:row:slot:)`.
-- **Out:** `ContentView.renderMoodBoard()` runs `ImageRenderer` over a fresh `MoodBoardMain().environment(pm)` and wraps the PNG in `MoodBoardImage`, a `Transferable` + `FileDocument` used by both `fileExporter` and `ShareLink`. There are separate macOS (`NSBitmapImageRep`) and iOS (`uiImage.pngData()`) implementations. Because export re-renders the view tree offscreen, anything that depends on the on-screen environment or container size will not appear in the exported PNG. `Moodboard/renderBoard.swift` is an empty stub.
+- **Out:** `BoardRenderer.pngData(for:)` runs `ImageRenderer` over a fresh `MoodBoardMain().environment(pm)`, with separate macOS (`NSBitmapImageRep`) and iOS (`uiImage.pngData()`) implementations. It is deliberately called only at the moment of export — from the Export button's action, which wraps the bytes in `MoodBoardImage` (a `FileDocument`) for `fileExporter`, and from `BoardShareItem`'s `Transferable` representation, which renders when `ShareLink` resolves the transfer. Evaluating it in `body` instead, as this used to, ran two full board renders per view update. Because export re-renders the view tree offscreen, anything that depends on the on-screen environment or container size will not appear in the exported PNG.
 
-### Adding or renaming files
+### Adding, renaming, and removing files
 
 `project.pbxproj` is `objectVersion = 56` with an **explicit file list** — not a `PBXFileSystemSynchronizedRootGroup`. A new `.swift` file dropped into a folder is **not** compiled until it is added to a `PBXSourcesBuildPhase`, and it fails *silently*: no error, no warning, the file just isn't part of any target. This isn't hypothetical — it's exactly why `MozaicTests`' source files existed on disk but had never been wired to the test target, and the suite had never run once before that was fixed.
 
@@ -127,4 +127,16 @@ ruby Scripts/add_sources.rb <target> <group path, slash separated> <file paths..
 ruby Scripts/add_sources.rb MozaicTests MozaicTests MozaicTests/SomeNewTests.swift
 ```
 
-It's idempotent (a file already in the target is skipped) and walks/creates the destination group in the project navigator to match. Renaming a file still means updating its `PBXFileReference` path directly — the script only adds, it doesn't rename.
+It's idempotent (a file already in the target is skipped) and walks/creates the destination group in the project navigator to match.
+
+Two companion scripts cover the other two operations. Both are idempotent, and neither touches the filesystem — do the `git rm` / `git mv` yourself:
+
+```sh
+# Drop a file's PBXFileReference and every build-phase entry pointing at it.
+ruby Scripts/remove_sources.rb Mozaic/Moodboard/SomeDeadFile.swift
+
+# Repoint a reference after `git mv`. New path must exist, old must not.
+ruby Scripts/rename_source.rb Mozaic/inspector/oldName.swift Mozaic/inspector/NewName.swift
+```
+
+A file that turns out to be *"not in project"* was never compiled in the first place — worth noticing rather than glossing over, since it means whatever it declared was dead.

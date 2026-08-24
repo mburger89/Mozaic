@@ -77,7 +77,7 @@ Nothing in this plan is verifiable until tests run. They currently do not, on ei
   `ruby Scripts/add_sources.rb <TargetName> <group/path> <file.swift> [more.swift...]`
   Every later task uses it. It is idempotent — re-adding an existing file is a no-op.
 
-- [ ] **Step 1: Write the file-adding script**
+- [x] **Step 1: Write the file-adding script**
 
 Create `Scripts/add_sources.rb`:
 
@@ -129,7 +129,7 @@ plan was written: it adds correctly, is idempotent on a second run, leaves
 `plutil -lint` clean, and writes a *relative* path (`sourceTree = "<group>"`)
 rather than an absolute one, so the project stays portable.
 
-- [ ] **Step 2: Confirm the tests really are absent before changing anything**
+- [x] **Step 2: Confirm the tests really are absent before changing anything**
 
 Run:
 ```bash
@@ -137,7 +137,7 @@ ruby -e 'require "xcodeproj"; Xcodeproj::Project.open("Mozaic.xcodeproj").target
 ```
 Expected: `Mozaic: 11 sources`, `MozaicTests: 0 sources`, `MozaicUITests: 0 sources`.
 
-- [ ] **Step 3: Replace the XCTest boilerplate with a Swift Testing smoke test**
+- [x] **Step 3: Replace the XCTest boilerplate with a Swift Testing smoke test**
 
 `MozaicTests/MozaicTests.swift` is empty XCTest scaffolding with no assertions. Delete it and create `MozaicTests/SmokeTests.swift`:
 
@@ -158,7 +158,7 @@ import Testing
 rm MozaicTests/MozaicTests.swift
 ```
 
-- [ ] **Step 4: Wire the test files into their targets**
+- [x] **Step 4: Wire the test files into their targets**
 
 ```bash
 ruby Scripts/add_sources.rb MozaicTests MozaicTests MozaicTests/SmokeTests.swift
@@ -168,21 +168,21 @@ plutil -lint Mozaic.xcodeproj/project.pbxproj
 ```
 Expected: files added, and `project.pbxproj: OK`.
 
-- [ ] **Step 5: Drop UI tests from the default test plan**
+- [x] **Step 5: Drop UI tests from the default test plan**
 
 The UI tests are unmodified boilerplate and their runner is what trips macOS signing. Keeping them in the default plan makes every TDD cycle slow and flaky. Remove that entry from `Mozaic.xctestplan`'s `testTargets` array, leaving only `MozaicTests`. Leave the target and its files in place so UI tests can be re-enabled later.
 
-- [ ] **Step 6: Run the suite**
+- [x] **Step 6: Run the suite**
 
 Run: `xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS' test 2>&1 | grep -E "Executed|TEST (SUCCEEDED|FAILED)|error:"`
 
 Expected: **TEST SUCCEEDED**, with the smoke test executed. This is the first time the suite has ever run — if it still fails, stop and diagnose before proceeding. Do not work around it by skipping tests.
 
-- [ ] **Step 7: Confirm the app still builds on both platforms**
+- [x] **Step 7: Confirm the app still builds on both platforms**
 
 Run both `build` commands from Global Constraints. Expected: `** BUILD SUCCEEDED **` twice.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add Scripts/ MozaicTests/ Mozaic.xctestplan Mozaic.xcodeproj/project.pbxproj
@@ -210,7 +210,7 @@ boilerplate UI tests from the default test plan to keep the cycle fast."
 **Interfaces:**
 - Produces: `ImageQuality`, `StoredImageMeta`, `Row`, `Board`, `BoardFile`, and `BoardFile.currentFormatVersion`. Task 5 encodes/decodes `BoardFile`; Task 6 holds a `Board` inside `ProjectModel`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/BoardManifestTests.swift`:
 
@@ -280,13 +280,13 @@ import Testing
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS' test -only-testing:MozaicTests/BoardManifestTests 2>&1 | grep -E "error:|TEST"`
 
 Expected: compile failure — `cannot find 'Board' in scope`.
 
-- [ ] **Step 3: Write the types**
+- [x] **Step 3: Write the types**
 
 Create `Mozaic/Document/BoardManifest.swift`:
 
@@ -378,7 +378,7 @@ struct BoardFile: Codable, Sendable {
 }
 ```
 
-- [ ] **Step 4: Wire the files into their targets and run the tests**
+- [x] **Step 4: Wire the files into their targets and run the tests**
 
 ```bash
 ruby Scripts/add_sources.rb Mozaic Mozaic/Document Mozaic/Document/BoardManifest.swift
@@ -388,7 +388,7 @@ xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS
 ```
 Expected: PASS, 4 tests executed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Mozaic/Document/BoardManifest.swift MozaicTests/BoardManifestTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -419,7 +419,7 @@ Mozaic never converts between formats. A JPEG stays a JPEG. Re-encoding happens 
   - `enum ImageCoderError: Error { case unrecognizedFormat, decodeFailed, encodeFailed }`
 - Task 4 calls `prepared(_:quality:)` on every import.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/ImageCoderTests.swift`:
 
@@ -519,12 +519,12 @@ import UniformTypeIdentifiers
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `xcodebuild ... test -only-testing:MozaicTests/ImageCoderTests`
 Expected: compile failure — `cannot find 'ImageCoder' in scope`.
 
-- [ ] **Step 3: Write the coder**
+- [x] **Step 3: Write the coder**
 
 Create `Mozaic/Document/ImageCoder.swift`:
 
@@ -640,7 +640,7 @@ enum ImageCoder {
 }
 ```
 
-- [ ] **Step 4: Wire up and run**
+- [x] **Step 4: Wire up and run**
 
 ```bash
 ruby Scripts/add_sources.rb Mozaic Mozaic/Document Mozaic/Document/ImageCoder.swift
@@ -649,7 +649,7 @@ xcodebuild ... test -only-testing:MozaicTests/ImageCoderTests
 ```
 Expected: PASS, 9 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Mozaic/Document/ImageCoder.swift MozaicTests/ImageCoderTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -685,7 +685,7 @@ The single owner of image bytes, and the only thing views ask for images. **The 
   - `func filename(for id: UUID) -> String?`
 - Task 5 reads `storedImages` for the snapshot; Task 6's views call `image(for:)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/ImageStoreTests.swift`:
 
@@ -776,12 +776,12 @@ import UniformTypeIdentifiers
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `xcodebuild ... test -only-testing:MozaicTests/ImageStoreTests`
 Expected: `cannot find 'ImageStore' in scope`.
 
-- [ ] **Step 3: Write the store**
+- [x] **Step 3: Write the store**
 
 Create `Mozaic/Document/ImageStore.swift`:
 
@@ -889,7 +889,7 @@ final class ImageStore {
 }
 ```
 
-- [ ] **Step 4: Wire up and run**
+- [x] **Step 4: Wire up and run**
 
 ```bash
 ruby Scripts/add_sources.rb Mozaic Mozaic/Document Mozaic/Document/ImageStore.swift
@@ -898,7 +898,7 @@ xcodebuild ... test -only-testing:MozaicTests/ImageStoreTests
 ```
 Expected: PASS, 7 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Mozaic/Document/ImageStore.swift MozaicTests/ImageStoreTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -931,7 +931,7 @@ put a full image decode in the render loop."
   - `static func read(_ wrapper: FileWrapper) throws -> BoardSnapshot`
   - `enum DocumentError: Error { case notAPackage, missingManifest, unsupportedVersion(Int) }`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/MozaicDocumentTests.swift`:
 
@@ -1071,12 +1071,12 @@ import UniformTypeIdentifiers
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `xcodebuild ... test -only-testing:MozaicTests/MozaicDocumentTests`
 Expected: `cannot find 'MozaicDocument' in scope`.
 
-- [ ] **Step 3: Declare the types**
+- [x] **Step 3: Declare the types**
 
 Create `Mozaic/Document/UTType+Mozaic.swift`:
 
@@ -1093,7 +1093,7 @@ extension UTType {
 }
 ```
 
-- [ ] **Step 4: Write the document**
+- [x] **Step 4: Write the document**
 
 Create `Mozaic/Document/MozaicDocument.swift`:
 
@@ -1241,7 +1241,7 @@ final class MozaicDocument: ReferenceFileDocument {
 }
 ```
 
-- [ ] **Step 5: Declare the document type in Info.plist**
+- [x] **Step 5: Declare the document type in Info.plist**
 
 Add to the top-level `<dict>` in `Mozaic/Info.plist`, alongside `NSHighResolutionCapable`:
 
@@ -1290,7 +1290,7 @@ Add to the top-level `<dict>` in `Mozaic/Info.plist`, alongside `NSHighResolutio
 
 Verify: `plutil -lint Mozaic/Info.plist` → `OK`.
 
-- [ ] **Step 6: Wire up and run**
+- [x] **Step 6: Wire up and run**
 
 ```bash
 ruby Scripts/add_sources.rb Mozaic Mozaic/Document \
@@ -1300,7 +1300,7 @@ xcodebuild ... test -only-testing:MozaicTests/MozaicDocumentTests
 ```
 Expected: PASS, 9 tests. The `reusedChild === originalChild` assertion is the one that proves incremental save works; if it fails, saves are rewriting every image and the reason for choosing a package is lost.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add Mozaic/Document/ Mozaic/Info.plist MozaicTests/MozaicDocumentTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -1344,7 +1344,7 @@ The deepest change in the plan. `ProjectModel` stops holding `Image` values and 
   - Convenience passthroughs kept for the views: `gridGap`, `cellRadius`, `projectName`, `createdBy`, `showBoardInfo`, `cellWidth`, `twoCellWidth`, `halfGridGap`
 - Task 7 replaces the drag payload; Task 8 hands `ProjectModel` a document-backed `Board`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/ProjectModelTests.swift`:
 
@@ -1447,12 +1447,12 @@ import UniformTypeIdentifiers
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `xcodebuild ... test -only-testing:MozaicTests/ProjectModelTests`
 Expected: failures — `value of type 'ProjectModel' has no member 'board'`.
 
-- [ ] **Step 3: Rewrite ProjectModel**
+- [x] **Step 3: Rewrite ProjectModel**
 
 Replace the contents of `Mozaic/Models/ProjectModel.swift`. `MbRow` is gone — `Row` from `BoardManifest.swift` replaces it — as are the `Image`-to-`Data` helpers, which `ImageCoder` and `ImageStore` now own.
 
@@ -1556,7 +1556,7 @@ final class ProjectModel {
 }
 ```
 
-- [ ] **Step 4: Run the model tests**
+- [x] **Step 4: Run the model tests**
 
 ```bash
 ruby Scripts/add_sources.rb MozaicTests MozaicTests MozaicTests/ProjectModelTests.swift
@@ -1564,7 +1564,7 @@ xcodebuild ... test -only-testing:MozaicTests/ProjectModelTests
 ```
 Expected: PASS, 8 tests. The views will not compile yet; that is Step 5.
 
-- [ ] **Step 5: Update the views**
+- [x] **Step 5: Update the views**
 
 `MbImage.swift` — take an optional ID and resolve through the model; show a placeholder when the image is missing (which is also what a document with a lost image renders):
 
@@ -1711,7 +1711,7 @@ and the `PhotosPicker` handler loads `Data` instead of `Image`:
 
 Update the inspector call site to `BottomBar(pm: pm, imageIDs: pm.board.tray)`.
 
-- [ ] **Step 6: Build both platforms and run the whole suite**
+- [x] **Step 6: Build both platforms and run the whole suite**
 
 ```bash
 xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS' build
@@ -1720,7 +1720,7 @@ xcodebuild -project Mozaic.xcodeproj -scheme Mozaic -destination 'platform=macOS
 ```
 Expected: both builds succeed; all tests pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add Mozaic/ MozaicTests/ProjectModelTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -1752,7 +1752,7 @@ The current payload is `Image`, which cannot survive: recovering bytes from a dr
 - Produces: `enum DroppedImage: Codable, Transferable { case reference(UUID); case external(Data, String) }` — the `String` is a UTI identifier, because `UTType` is not `Codable`.
 - Produces: `ProjectModel.accept(_ dropped: DroppedImage, row: Int, slot: Int) throws`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/DroppedImageTests.swift`:
 
@@ -1830,11 +1830,11 @@ import UniformTypeIdentifiers
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: `cannot find 'DroppedImage' in scope`.
 
-- [ ] **Step 3: Write the payload and the accept path**
+- [x] **Step 3: Write the payload and the accept path**
 
 Create `Mozaic/Moodboard/DroppedImage.swift`:
 
@@ -1883,7 +1883,7 @@ extension ProjectModel {
 }
 ```
 
-- [ ] **Step 4: Restore drag and drop in the views**
+- [x] **Step 4: Restore drag and drop in the views**
 
 In `MbImage.swift`, attach the drag **inside** the branch that already knows an
 image exists, so an empty slot is simply not draggable. A slot must never
@@ -1945,7 +1945,7 @@ In `bottomBar.swift`, make tray thumbnails draggable by reference:
 }
 ```
 
-- [ ] **Step 5: Build, test, and check the drag path by hand**
+- [x] **Step 5: Build, test, and check the drag path by hand**
 
 ```bash
 xcodebuild ... -destination 'platform=macOS' build
@@ -1955,7 +1955,7 @@ xcodebuild ... -destination 'platform=macOS' test
 
 Then run the app and verify by hand, because this is the path commit 6115747 was written to fix: import several large photos, drag one from the tray to a slot, and drag between slots. **Dragging must feel no slower than before this plan started.** If it does, stop and check that `ImageStore.image(for:)` is hitting its cache rather than decoding per frame.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Mozaic/Moodboard/ Mozaic/inspector/bottomBar.swift MozaicTests/DroppedImageTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -1980,7 +1980,7 @@ external drops carry bytes plus their content type so format survives."
 - Consumes: `MozaicDocument`, `ProjectModel`.
 - Produces: `ContentView(document: MozaicDocument)`.
 
-- [ ] **Step 1: Give MozaicDocument a ProjectModel**
+- [x] **Step 1: Give MozaicDocument a ProjectModel**
 
 `ContentView` needs one `ProjectModel` whose edits the document can snapshot. Replace `MozaicDocument`'s stored `board`/`images` pair with a model that owns both, keeping `snapshot(contentType:)` reading through it. In `Mozaic/Document/MozaicDocument.swift`:
 
@@ -2002,7 +2002,7 @@ external drops carry bytes plus their content type so format survives."
 	}
 ```
 
-- [ ] **Step 2: Switch the app to DocumentGroup**
+- [x] **Step 2: Switch the app to DocumentGroup**
 
 Replace `Mozaic/MozaicApp.swift` entirely — the SwiftData container goes with it:
 
@@ -2026,7 +2026,7 @@ struct MozaicApp: App {
 }
 ```
 
-- [ ] **Step 3: Take the document in ContentView**
+- [x] **Step 3: Take the document in ContentView**
 
 In `Mozaic/ContentView.swift`, replace `@State var pm: ProjectModel = ProjectModel()` with:
 
@@ -2037,7 +2037,7 @@ In `Mozaic/ContentView.swift`, replace `@State var pm: ProjectModel = ProjectMod
 
 Remove `import SwiftData`. Update the preview to `ContentView(document: MozaicDocument())`.
 
-- [ ] **Step 4: Delete the SwiftData model**
+- [x] **Step 4: Delete the SwiftData model**
 
 ```bash
 git rm Mozaic/Models/MDataModel.swift
@@ -2051,7 +2051,7 @@ puts ref ? "removed MDataModel.swift from project" : "not referenced"
 '
 ```
 
-- [ ] **Step 5: Build, test, and exercise the document lifecycle**
+- [x] **Step 5: Build, test, and exercise the document lifecycle**
 
 ```bash
 xcodebuild ... -destination 'platform=macOS' build
@@ -2067,7 +2067,7 @@ python3 -m json.tool ~/Desktop/Test.mozaic/manifest.json | head -40
 ```
 Expected: a `manifest.json` plus one file per image, each with its own extension.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
@@ -2099,7 +2099,7 @@ Documents need ⌘Z. `ReferenceFileDocument` supplies the `UndoManager` through 
 **Interfaces:**
 - Produces: `ProjectModel.undoManager: UndoManager?` and `func withUndo(_ name: String, _ change: (ProjectModel) -> Void)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/UndoTests.swift`:
 
@@ -2160,11 +2160,11 @@ import Testing
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: `value of type 'ProjectModel' has no member 'undoManager'`.
 
-- [ ] **Step 3: Add undo registration**
+- [x] **Step 3: Add undo registration**
 
 Append to `ProjectModel`:
 
@@ -2189,7 +2189,7 @@ Append to `ProjectModel`:
 	}
 ```
 
-- [ ] **Step 4: Route mutations through withUndo**
+- [x] **Step 4: Route mutations through withUndo**
 
 In `ContentView`, pick up the environment's manager and hand it to the model:
 
@@ -2212,11 +2212,11 @@ Then wrap each mutation site:
 - `ContentView`'s importers: `pm.withUndo("Import Image") { try? $0.importImage(data) }`
 - `BoardSettings`' sliders and text fields: bind through a helper that calls `withUndo("Change Grid Gap")` etc. Slider drags coalesce naturally, because `UndoManager` groups by event loop turn unless `groupsByEvent` is disabled.
 
-- [ ] **Step 5: Build, test, and try ⌘Z by hand**
+- [x] **Step 5: Build, test, and try ⌘Z by hand**
 
 Run the full suite plus both builds. Then in the running app: change a layout, press ⌘Z, confirm it reverts; ⇧⌘Z, confirm it returns. Drag a slider and confirm one ⌘Z undoes the whole drag rather than one step per pixel.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Mozaic/ MozaicTests/UndoTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -2239,7 +2239,7 @@ per-property bookkeeping. Slider drags coalesce into one undo step."
 **Interfaces:**
 - Produces: `ImageStore.totalByteCount: Int`, `ImageStore.reduceFileSize() throws -> Int` (returns bytes saved).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `MozaicTests/ReduceFileSizeTests.swift`:
 
@@ -2312,11 +2312,11 @@ import UniformTypeIdentifiers
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: `value of type 'ImageStore' has no member 'totalByteCount'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Append to `ImageStore`:
 
@@ -2348,7 +2348,7 @@ Append to `ImageStore`:
 	}
 ```
 
-- [ ] **Step 4: Add the inspector controls**
+- [x] **Step 4: Add the inspector controls**
 
 In `BoardSettings.swift`, inside the existing `Section`:
 
@@ -2377,11 +2377,11 @@ In `BoardSettings.swift`, inside the existing `Section`:
 
 with `@State private var isConfirmingReduce = false` on the view. Showing document size next to the quality toggle is deliberate: Full mode is unbounded, so the cost should be visible when someone opts in rather than discovered when sharing fails.
 
-- [ ] **Step 5: Run the full suite and both builds**
+- [x] **Step 5: Run the full suite and both builds**
 
 Expected: all green.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Mozaic/ MozaicTests/ReduceFileSizeTests.swift Mozaic.xcodeproj/project.pbxproj
@@ -2401,7 +2401,7 @@ moment of opting in."
 **Files:**
 - Modify: `CLAUDE.md`
 
-- [ ] **Step 1: Rewrite the stale sections**
+- [x] **Step 1: Rewrite the stale sections**
 
 CLAUDE.md currently describes the pre-conversion architecture. Update:
 
@@ -2411,7 +2411,7 @@ CLAUDE.md currently describes the pre-conversion architecture. Update:
 - **Test suite** → the files are wired in now and the suite runs; UI tests are excluded from the default test plan.
 - **Add:** the `.mozaic` package layout, the immutable-bytes-per-ID invariant that incremental save depends on, and `Scripts/add_sources.rb` as the required way to add files.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add CLAUDE.md
