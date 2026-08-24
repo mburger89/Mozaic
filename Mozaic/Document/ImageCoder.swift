@@ -3,20 +3,6 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
-enum ImageCoderError: Error, Equatable {
-	case unrecognizedFormat
-	case decodeFailed
-	case encodeFailed
-}
-
-/// An image ready to be stored: bytes, the format they are in, and dimensions.
-struct PreparedImage: Sendable {
-	var data: Data
-	var contentType: UTType
-	var pixelWidth: Int
-	var pixelHeight: Int
-}
-
 /// Format-preserving image handling, built on ImageIO so one implementation
 /// serves macOS and iPadOS.
 ///
