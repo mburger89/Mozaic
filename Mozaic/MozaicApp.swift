@@ -6,28 +6,12 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @main
 struct MozaicApp: App {
-	var sharedModelContainer: ModelContainer = {
-		let schema = Schema([
-			MDataModel.self,
-		])
-		let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-
-		do {
-			return try ModelContainer(for: schema, configurations: [modelConfiguration])
-		} catch {
-			fatalError("Could not create ModelContainer: \(error)")
+	var body: some Scene {
+		DocumentGroup(newDocument: { MozaicDocument() }) { configuration in
+			ContentView(document: configuration.document)
 		}
-	}()
-
-    var body: some Scene {
-        WindowGroup {
-			ContentView()
-				.modelContainer(sharedModelContainer)
-        }
-    }
+	}
 }
-

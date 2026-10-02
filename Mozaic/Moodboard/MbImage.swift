@@ -1,49 +1,57 @@
 import SwiftUI
 
 struct MbImage: View {
-//	@Environment(ProjectModel.self) private var pm
 	var pm: ProjectModel
 	@State private var isTarget: Bool = false
-	var imgSlot: Image
+	var imageID: UUID?
 	let imgWidth: CGFloat
 	let imgHeight: CGFloat
 	var indexes: [Int]
+
 	var body: some View {
-		imgSlot
-			.resizable()
-			.aspectRatio(contentMode: .fill)
-			.frame(width: imgWidth, height: imgHeight)
-			.background(Material.thin)
-			.contentShape(.rect(cornerRadius: pm.cellRadius).inset(by: 20))
-			.dropDestination(for: Image.self, action: {items, location in
-				pm.writeToModel(items: items, indexs: indexes)
-				return true
-			}, isTargeted: { target in
-				isTarget = target
-			})
-			.draggable(imgSlot) {
-					imgSlot
-						.resizable()
-						.aspectRatio(contentMode: .fill)
-						.frame(width: imgWidth / 2, height: imgHeight / 2)
-						.contentShape(.dragPreview, .rect(cornerRadius: pm.cellRadius))
-						.clipShape(.rect(cornerRadius: pm.cellRadius))
+		Group {
+			if let imageID, let image = pm.image(for: imageID) {
+				image
+					.resizable()
+					.aspectRatio(contentMode: .fill)
+					.draggable(DroppedImage.reference(imageID)) {
+						image
+							.resizable()
+							.aspectRatio(contentMode: .fill)
+							.frame(width: imgWidth / 2, height: imgHeight / 2)
+							.clipShape(.rect(cornerRadius: pm.cellRadius))
+					}
+			} else {
+				Image("OGbgImg")
+					.resizable()
+					.aspectRatio(contentMode: .fill)
 			}
-			.overlay {
-				RoundedRectangle(cornerRadius: pm.cellRadius)
-					.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)
-					.frame(width: imgWidth, height: imgHeight)
+		}
+		.frame(width: imgWidth, height: imgHeight)
+		.background(Material.thin)
+		.dropDestination(for: DroppedImage.self) { items, _ in
+			guard let first = items.first else { return false }
+			var accepted = false
+			pm.withUndo("Move Image") { model in
+				do {
+					accepted = try model.accept(first, row: indexes[0], slot: indexes[1])
+				} catch {
+					model.postNotice("Couldn't add that image. It may be damaged or in a format Mozaic can't read.")
+					accepted = false
+				}
 			}
-			.clipShape(.rect(cornerRadius: pm.cellRadius))
+			return accepted
+		} isTargeted: { isTarget = $0 }
+		.contentShape(.rect(cornerRadius: pm.cellRadius).inset(by: 20))
+		.overlay {
+			RoundedRectangle(cornerRadius: pm.cellRadius)
+				.stroke((isTarget ? .blue : .clear), lineWidth: 3.0)
+				.frame(width: imgWidth, height: imgHeight)
+		}
+		.clipShape(.rect(cornerRadius: pm.cellRadius))
 	}
 }
 
 #Preview {
-	MbImage(
-		pm: ProjectModel(),
-		imgSlot: Image("OGbgImg"),
-		imgWidth: 150.0,
-		imgHeight: (150.0 * 2),
-		indexes: [0,0]
-	).environment(ProjectModel())
+	MbImage(pm: ProjectModel(), imageID: nil, imgWidth: 150.0, imgHeight: 300.0, indexes: [0, 0])
 }
